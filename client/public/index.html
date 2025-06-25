@@ -6,13 +6,31 @@
     <title>Schwanenhöfe 3D Map</title>
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.css">
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.2.0/mapbox-gl-directions.css">
-    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="./styles/styles.css">
 </head>
 <body>
-    <div id="app-root"></div>
+    <div id="app-root">
+        <div style="padding: 20px; text-align: center;">
+            <h1>Loading Schwanenhöfe 3D Map...</h1>
+            <p>If you see this message for more than a few seconds, there might be an error.</p>
+        </div>
+    </div>
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.10.0/mapbox-gl.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.2.0/mapbox-gl-directions.js"></script>
-    <script type="module" src="/companies.js"></script>
-    <script type="module" src="/main.js"></script>
+    <script type="module" src="./companies.js"></script>
+    <script type="module" src="./main.js"></script>
+    <script>
+        // Add error handling for module loading
+        window.addEventListener('error', function(e) {
+            console.error('Script error:', e.error);
+            document.getElementById('app-root').innerHTML = `
+                <div style="padding: 20px; text-align: center; color: red;">
+                    <h1>Error Loading Application</h1>
+                    <p>There was an error loading the application. Please check the console for details.</p>
+                    <p>Error: ${e.error ? e.error.message : 'Unknown error'}</p>
+                </div>
+            `;
+        });
+    </script>
 </body>
 </html> 

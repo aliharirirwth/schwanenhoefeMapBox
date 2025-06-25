@@ -2,43 +2,70 @@ import { companies, buildingNumbers } from './companies.js';
 
 // Utility to load HTML components
 async function loadComponent(path) {
-    const res = await fetch(path);
-    return await res.text();
+    try {
+        const res = await fetch(path);
+        if (!res.ok) {
+            throw new Error(`Failed to load component: ${path} (${res.status} ${res.statusText})`);
+        }
+        return await res.text();
+    } catch (error) {
+        console.error(`Error loading component ${path}:`, error);
+        throw error;
+    }
 }
 
 async function renderApp() {
-    const appRoot = document.getElementById('app-root');
-    // Load all components
-    const [header, map, searchbar, buildingsScroll, buildingsList, footer] = await Promise.all([
-        loadComponent('/components/header.html'),
-        loadComponent('/components/map.html'),
-        loadComponent('/components/searchbar.html'),
-        loadComponent('/components/buildings-scroll.html'),
-        loadComponent('/components/buildings-list.html'),
-        loadComponent('/components/footer.html'),
-    ]);
+    try {
+        const appRoot = document.getElementById('app-root');
+        // Load all components
+        const [header, map, searchbar, buildingsScroll, buildingsList, footer] = await Promise.all([
+            loadComponent('./components/header.html'),
+            loadComponent('./components/map.html'),
+            loadComponent('./components/searchbar.html'),
+            loadComponent('./components/buildings-scroll.html'),
+            loadComponent('./components/buildings-list.html'),
+            loadComponent('./components/footer.html'),
+        ]);
 
-    // Compose the main structure
-    appRoot.innerHTML = `
-        ${header}
-        <div class="main-wrapper">
-            ${map}
-            <div id="right-panel">
-                <div class="panel-toggle" onclick="togglePanel()"></div>
-                ${searchbar}
-                ${buildingsScroll}
-                ${buildingsList}
-                ${footer}
+        // Compose the main structure
+        appRoot.innerHTML = `
+            ${header}
+            <div class="main-wrapper">
+                ${map}
+                <div id="right-panel">
+                    <div class="panel-toggle" onclick="togglePanel()"></div>
+                    ${searchbar}
+                    ${buildingsScroll}
+                    ${buildingsList}
+                    ${footer}
+                </div>
             </div>
-        </div>
-    `;
+        `;
 
-    // After DOM is ready, initialize logic
-    initAppLogic();
+        // After DOM is ready, initialize logic
+        initAppLogic();
+    } catch (error) {
+        console.error('Error rendering app:', error);
+        document.getElementById('app-root').innerHTML = `
+            <div style="padding: 20px; text-align: center; color: red;">
+                <h1>Error Loading Application</h1>
+                <p>There was an error loading the application components.</p>
+                <p>Error: ${error.message}</p>
+            </div>
+        `;
+    }
 }
 
 // Placeholder for all app logic (map, search, UI events, etc.)
 function initAppLogic() {
+    // Add the missing togglePanel function
+    window.togglePanel = function() {
+        const panel = document.getElementById('right-panel');
+        if (panel) {
+            panel.classList.toggle('closed');
+        }
+    };
+
     // Set your Mapbox access token
     mapboxgl.accessToken = 'pk.eyJ1Ijoic2VyaHV6IiwiYSI6ImNseXpvc3RlczJpbnIya3FscDU2aHc5d3EifQ.FHtPjde_lqensSHZxqthgw';
 
@@ -128,7 +155,7 @@ function initAppLogic() {
         companiesToRender.forEach(c => {
             const btn = document.createElement('button');
             btn.className = 'company-circle company-btn';
-            btn.innerHTML = `<img class="company-logo" src="/${c.logo}" alt="${c.name}" /><div class="company-name">${c.name}</div>`;
+            btn.innerHTML = `<img class="company-logo" src="./${c.logo}" alt="${c.name}" /><div class="company-name">${c.name}</div>`;
             btn.onclick = () => {
                 document.querySelectorAll('.company-btn').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
