@@ -58,4 +58,13 @@ jspm_packages/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db 
+Thumbs.db
+
+# Sensitive business files
+image_logos/
+*.xlsx
+*.xls
+Schwanenhöfe*.png
+Schwanenhöfe*.jpg
+*Lageplan*
+*Mieterliste* 
