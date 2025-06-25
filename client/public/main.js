@@ -114,6 +114,10 @@ function initAppLogic() {
 
     // Set your Mapbox access token
     mapboxgl.accessToken = 'pk.eyJ1Ijoic2VyaHV6IiwiYSI6ImNseXpvc3RlczJpbnIya3FscDU2aHc5d3EifQ.FHtPjde_lqensSHZxqthgw';
+    
+    // Test Mapbox token
+    console.log('Mapbox access token set:', mapboxgl.accessToken ? 'Yes' : 'No');
+    console.log('Token preview:', mapboxgl.accessToken.substring(0, 20) + '...');
 
     // Fallback location (Schwanenhöfe)
     const fallbackLocation = [6.8143, 51.2187];
@@ -429,23 +433,33 @@ function initAppLogic() {
 
     // Draw navigation route with gradient from user's current location
     function drawRoute() {
+        console.log('=== DRAWING ROUTE ===');
+        console.log('Selected destination:', selectedDestination);
+        console.log('User current location:', userCurrentLocation);
+        
         if (!selectedDestination || !userCurrentLocation) {
             console.error('Missing destination or user location for route drawing');
+            console.log('selectedDestination:', selectedDestination);
+            console.log('userCurrentLocation:', userCurrentLocation);
             return;
         }
         
         const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${userCurrentLocation[0]},${userCurrentLocation[1]};${selectedDestination[0]},${selectedDestination[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
         
         console.log('Drawing route from', userCurrentLocation, 'to', selectedDestination);
+        console.log('API URL:', url);
         
+        console.log('Making fetch request...');
         fetch(url)
             .then(res => {
+                console.log('Response received:', res.status, res.statusText);
                 if (!res.ok) {
                     throw new Error(`Directions API error: ${res.status} ${res.statusText}`);
                 }
                 return res.json();
             })
             .then(json => {
+                console.log('JSON response:', json);
                 if (!json.routes || json.routes.length === 0) {
                     throw new Error('No route found');
                 }
@@ -455,9 +469,11 @@ function initAppLogic() {
                 traveledPath = [userCurrentLocation];
 
                 console.log('Route drawn successfully:', currentRoute);
+                console.log('Route geometry:', data);
 
                 // Add or update route with gradient
                 if (!map.getSource('route')) {
+                    console.log('Creating new route source and layer...');
                     map.addSource('route', { type: 'geojson', data: { type: 'Feature', geometry: data } });
                     map.addLayer({
                         id: 'route',
@@ -478,18 +494,27 @@ function initAppLogic() {
                         }
                     });
                     routeLine = true;
+                    console.log('Route layer created successfully');
                 } else {
+                    console.log('Updating existing route source...');
                     map.getSource('route').setData({ type: 'Feature', geometry: data });
+                    console.log('Route source updated successfully');
                 }
 
                 // Only show one destination marker at a time
-                if (destinationMarker) destinationMarker.remove();
+                if (destinationMarker) {
+                    console.log('Removing existing destination marker...');
+                    destinationMarker.remove();
+                }
+                console.log('Adding new destination marker...');
                 destinationMarker = new mapboxgl.Marker({ color: 'red' })
                     .setLngLat(selectedDestination)
                     .addTo(map);
+                console.log('Destination marker added successfully');
             })
             .catch(error => {
                 console.error('Error drawing route:', error);
+                console.error('Error details:', error.message);
                 // Show error to user
                 alert('Error drawing route: ' + error.message);
             });
@@ -497,10 +522,33 @@ function initAppLogic() {
 
     // Start navigation: draw route and activate navigation mode
     function startNavigation() {
-        console.log('Starting navigation to:', selectedDestination);
+        console.log('=== STARTING NAVIGATION ===');
+        console.log('Selected destination:', selectedDestination);
+        console.log('User current location:', userCurrentLocation);
+        console.log('Navigation active before:', navigationActive);
+        
+        if (!selectedDestination) {
+            console.error('No destination selected!');
+            alert('No destination selected. Please select a building or company first.');
+            return;
+        }
+        
+        if (!userCurrentLocation) {
+            console.error('No user location available!');
+            alert('Unable to get your location. Please allow location access.');
+            return;
+        }
+        
         navigationActive = true;
+        console.log('Navigation active after:', navigationActive);
+        
+        console.log('Calling drawRoute...');
         drawRoute();
+        
+        console.log('Calling attachEndNavigationToMarker...');
         attachEndNavigationToMarker();
+        
+        console.log('Navigation started successfully');
     }
 
     // End navigation: clear route and deactivate navigation mode
