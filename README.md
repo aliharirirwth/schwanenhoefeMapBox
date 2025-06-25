@@ -1,171 +1,97 @@
-# Schwanenhöfe MapBox 3D Buildings Application
+# 🏢 Schwanenhöfe 3D Interactive Map
 
-A modern, interactive 3D map application showcasing the Schwanenhöfe buildings using MapBox GL JS. This application provides an immersive experience to explore the buildings with detailed information about tenants and companies.
+An interactive 3D map application for the Schwanenhöfe business complex in Düsseldorf, Germany. Built with modern web technologies to provide an immersive navigation experience.
 
 ## 🌟 Features
 
-- **3D Building Visualization**: Interactive 3D buildings with realistic rendering
-- **Building Information**: Detailed information about each building including:
-  - Building names and addresses
-  - Tenant information
-  - Company details and logos
-  - Contact information
-- **Search Functionality**: Search buildings by name or company
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Modern UI**: Clean, professional interface with smooth animations
-- **Company Showcase**: Display of tenant companies with their logos
+- **3D Building Visualization** - Realistic 3D models of all buildings
+- **Interactive Navigation** - Turn-by-turn directions to any building or company
+- **Company Directory** - Browse and search through all tenants
+- **Real-time Location** - GPS-based positioning and route tracking
+- **Responsive Design** - Works seamlessly on desktop and mobile devices
+- **Search Functionality** - Find companies or buildings quickly
 
-## 🏗️ Project Structure
+## 🚀 Live Demo
+
+**[Visit the Application](https://aliharirirwth.github.io/schwanenhoefeMapBox/)**
+
+## 🛠️ Technology Stack
+
+- **Frontend**: Vanilla JavaScript (ES6+)
+- **Mapping**: Mapbox GL JS
+- **3D Rendering**: WebGL via Mapbox
+- **Styling**: CSS3 with responsive design
+- **Deployment**: GitHub Pages
+
+## 📁 Project Structure
 
 ```
-mapbox-3d-buildings-filtered-main/
-├── client/
-│   ├── public/
-│   │   ├── components/          # HTML components
-│   │   ├── image_logos/         # Company logos
-│   │   ├── styles/              # CSS stylesheets
-│   │   ├── index.html           # Main application
-│   │   ├── main.js              # Main JavaScript file
-│   │   └── companies.js         # Company data
-│   └── src/                     # Source files
-├── server/
-│   ├── index.js                 # Express server
-│   ├── package.json             # Server dependencies
-│   └── package-lock.json
-├── image_logos/                 # Additional logos
-└── README.md                    # This file
+client/public/
+├── js/
+│   ├── utils.js          # Utility functions
+│   ├── navigation.js     # Navigation logic
+│   └── ui.js            # UI components
+├── components/           # HTML components
+├── styles/              # CSS stylesheets
+├── image_logos/         # Company logos
+├── main.js              # Main application
+├── companies.js         # Company data
+└── index.html           # Entry point
 ```
 
-## 🚀 Getting Started
+## 🎯 Key Features Explained
+
+### 3D Buildings
+- Realistic building heights and shapes
+- Interactive 3D visualization
+- Building labels and markers
+
+### Navigation System
+- GPS-based location tracking
+- Turn-by-turn directions
+- Real-time route updates
+- Distance calculations
+
+### Company Directory
+- Complete tenant database
+- Search by company name or building
+- Company logos and information
+- Building number grid
+
+## 🔧 Development
 
 ### Prerequisites
+- Modern web browser with ES6+ support
+- Mapbox access token
 
-- Node.js (v14 or higher)
-- npm or yarn
-- MapBox API key
+### Local Development
+1. Clone the repository
+2. Open `client/public/index.html` in a web browser
+3. Allow location access for full functionality
 
-### Installation
+### Building
+No build process required - pure vanilla JavaScript.
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/aliharirirwth/schwanenhoefeMapBox.git
-   cd schwanenhoefeMapBox
-   ```
+## 📱 Browser Support
 
-2. **Install server dependencies**
-   ```bash
-   cd server
-   npm install
-   ```
+- Chrome 60+
+- Firefox 55+
+- Safari 12+
+- Edge 79+
 
-3. **Set up environment variables**
-   Create a `.env` file in the server directory:
-   ```env
-   MAPBOX_ACCESS_TOKEN=your_mapbox_access_token_here
-   PORT=3000
-   ```
+## 🤝 Contributing
 
-4. **Start the server**
-   ```bash
-   npm start
-   ```
-
-5. **Open the application**
-   Navigate to `http://localhost:3000` in your browser
-
-## 🎯 Usage
-
-### For Users
-1. **Explore Buildings**: Navigate around the 3D map to explore different buildings
-2. **View Information**: Click on buildings to see detailed information
-3. **Search**: Use the search bar to find specific buildings or companies
-4. **Company Details**: View company information and logos in the sidebar
-
-### For Developers
-1. **Add New Buildings**: Update the building data in the appropriate files
-2. **Modify Styling**: Edit CSS files in `client/public/styles/`
-3. **Update Company Data**: Modify `client/public/companies.js`
-4. **Add New Features**: Extend the JavaScript functionality in `client/public/main.js`
-
-## 🛠️ Technologies Used
-
-- **Frontend**:
-  - HTML5
-  - CSS3
-  - JavaScript (ES6+)
-  - MapBox GL JS
-  - Bootstrap (for responsive design)
-
-- **Backend**:
-  - Node.js
-  - Express.js
-  - CORS middleware
-
-- **Data**:
-  - Excel file processing (XLSX)
-  - JSON data structures
-
-## 📱 Features in Detail
-
-### 3D Building Visualization
-- Realistic 3D building models
-- Interactive camera controls
-- Smooth zoom and pan functionality
-- Building highlighting on hover
-
-### Building Information System
-- Comprehensive building details
-- Tenant information
-- Company profiles
-- Contact information
-- Interactive popups
-
-### Search and Filter
-- Real-time search functionality
-- Filter by building name
-- Filter by company name
-- Dynamic results updating
-
-### Responsive Design
-- Mobile-friendly interface
-- Adaptive layout
-- Touch-friendly controls
-- Cross-browser compatibility
-
-## 🔧 Configuration
-
-### MapBox Configuration
-The application uses MapBox GL JS for 3D visualization. Configure your MapBox access token in the environment variables.
-
-### Building Data
-Building information is stored in structured data files. Update these files to add or modify building information.
-
-### Styling
-The application uses custom CSS for styling. Modify the stylesheets in `client/public/styles/` to customize the appearance.
+This is a private project for the Schwanenhöfe business complex. For questions or support, please contact the development team.
 
 ## 📄 License
 
-This project is proprietary and confidential. All rights reserved.
+This project is proprietary software developed for Schwanenhöfe.
 
-## 👥 Contributing
+## 📞 Contact
 
-This is a private project for Schwanenhöfe. For any modifications or improvements, please contact the development team.
-
-## 📞 Support
-
-For technical support or questions about the application, please contact:
-- Email: [Contact Email]
-- Phone: [Contact Phone]
-
-## 🔄 Updates
-
-### Version 1.0.0
-- Initial release
-- 3D building visualization
-- Building information system
-- Search functionality
-- Responsive design
+**Developer**: Ali Hariri  
+**Email**: ali.hariri@mov.dev
 
 ---
 
-**Note**: This application is specifically designed for the Schwanenhöfe project and contains proprietary information about the buildings and tenants. 
+*Built with ❤️ for the Schwanenhöfe community* 
