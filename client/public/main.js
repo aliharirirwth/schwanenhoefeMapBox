@@ -86,6 +86,32 @@ function initAppLogic() {
         }
     };
 
+    // Add manual location test function
+    window.testLocation = function() {
+        console.log('=== LOCATION TEST ===');
+        console.log('Current user location:', userCurrentLocation);
+        console.log('Selected destination:', selectedDestination);
+        console.log('Navigation active:', navigationActive);
+        console.log('Current route:', currentRoute);
+        
+        if (selectedDestination) {
+            const distance = calculateDistance(userCurrentLocation, selectedDestination);
+            console.log('Distance to destination:', distance, 'meters (', (distance/1000).toFixed(2), 'km)');
+        }
+        
+        // Test if we can get current location
+        if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const loc = [position.coords.longitude, position.coords.latitude];
+                    console.log('Current GPS location:', loc);
+                    console.log('Distance from GPS to destination:', selectedDestination ? calculateDistance(loc, selectedDestination) : 'N/A', 'meters');
+                },
+                error => console.error('GPS error:', error)
+            );
+        }
+    };
+
     // Set your Mapbox access token
     mapboxgl.accessToken = 'pk.eyJ1Ijoic2VyaHV6IiwiYSI6ImNseXpvc3RlczJpbnIya3FscDU2aHc5d3EifQ.FHtPjde_lqensSHZxqthgw';
 
@@ -130,6 +156,10 @@ function initAppLogic() {
 
     // Update company and building selection to show modal
     function handleDestinationSelection(coords) {
+        console.log('Destination selected:', coords);
+        console.log('Current user location:', userCurrentLocation);
+        console.log('Distance to destination:', calculateDistance(userCurrentLocation, coords), 'meters');
+        
         selectedDestination = coords;
         showNavigationModal(() => {
             startNavigation();
@@ -357,19 +387,22 @@ function initAppLogic() {
 
     // Show user location
     if ('geolocation' in navigator) {
-        // Set up continuous location updates
-        const watchId = navigator.geolocation.watchPosition(
+        console.log('Geolocation available, starting location tracking...');
+        navigator.geolocation.watchPosition(
             position => {
-                userCurrentLocation = [position.coords.longitude, position.coords.latitude];
+                const loc = [position.coords.longitude, position.coords.latitude];
+                console.log('Location update received:', loc);
+                console.log('Accuracy:', position.coords.accuracy, 'meters');
+                userCurrentLocation = loc;
                 if (userMarker) userMarker.remove();
                 userMarker = new mapboxgl.Marker({ color: 'blue' })
-                    .setLngLat(userCurrentLocation)
+                    .setLngLat(loc)
                     .addTo(map);
                 
                 // Only zoom to location when navigation is active
                 if (navigationActive) {
                     map.flyTo({ 
-                        center: userCurrentLocation, 
+                        center: loc, 
                         zoom: 18,
                         bearing: position.coords.heading || 0,
                         pitch: 60,
@@ -377,7 +410,10 @@ function initAppLogic() {
                     });
                 }
             },
-            error => console.error('Error getting location:', error),
+            error => {
+                console.error('Error getting location:', error);
+                console.log('Using fallback location:', userCurrentLocation);
+            },
             { 
                 enableHighAccuracy: true,
                 maximumAge: 0,
@@ -385,6 +421,7 @@ function initAppLogic() {
             }
         );
     } else {
+        console.log('Geolocation not available, using fallback location:', userCurrentLocation);
         userMarker = new mapboxgl.Marker({ color: 'blue' })
             .setLngLat(userCurrentLocation)
             .addTo(map);
@@ -521,36 +558,6 @@ function initAppLogic() {
                 ]);
             }
         }
-    }
-
-    // Geolocation update every second
-    if ('geolocation' in navigator) {
-        navigator.geolocation.watchPosition(
-            position => {
-                const loc = [position.coords.longitude, position.coords.latitude];
-                handleLocationUpdate(loc);
-                // Only zoom to location when navigation is active
-                if (navigationActive) {
-                    map.flyTo({ 
-                        center: loc, 
-                        zoom: 18,
-                        bearing: position.coords.heading || 0,
-                        pitch: 60,
-                        duration: 1000
-                    });
-                }
-            },
-            error => console.error('Error getting location:', error),
-            { 
-                enableHighAccuracy: true,
-                maximumAge: 0,
-                timeout: 1000
-            }
-        );
-    } else {
-        userMarker = new mapboxgl.Marker({ color: 'blue' })
-            .setLngLat(userCurrentLocation)
-            .addTo(map);
     }
 
     // End navigation by clicking marker
