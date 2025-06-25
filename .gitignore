@@ -1,3 +1,21 @@
+# Ignore images everywhere except client/public/image_logos/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.webp
+*.svg
+
+# But NOT in client/public/image_logos/
+!client/public/image_logos/*.jpg
+!client/public/image_logos/*.jpeg
+!client/public/image_logos/*.png
+!client/public/image_logos/*.gif
+!client/public/image_logos/*.bmp
+!client/public/image_logos/*.webp
+!client/public/image_logos/*.svg
+
 # Dependencies
 node_modules/
 npm-debug.log*
@@ -60,8 +78,7 @@ jspm_packages/
 ehthumbs.db
 Thumbs.db
 
-# Sensitive business files
-image_logos/
+# Sensitive business files - only ignore specific files, not entire directories
 *.xlsx
 *.xls
 Schwanenhöfe*.png
