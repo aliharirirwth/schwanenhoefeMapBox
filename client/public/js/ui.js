@@ -124,16 +124,44 @@ export class UIManager {
     }
 
     handleDestinationSelection(coords) {
-        console.log('Destination selected:', coords);
+        console.log('=== DESTINATION SELECTION ===');
+        console.log('Destination coordinates:', coords);
+        
+        // Validate coordinates
+        if (!coords || !Array.isArray(coords) || coords.length !== 2) {
+            console.error('Invalid coordinates provided:', coords);
+            alert('Invalid destination coordinates. Please try selecting a different destination.');
+            return;
+        }
+        
+        const [lng, lat] = coords;
+        if (lng < -180 || lng > 180 || lat < -90 || lat > 90) {
+            console.error('Coordinates out of bounds:', coords);
+            alert('Invalid destination coordinates. Please try selecting a different destination.');
+            return;
+        }
+        
+        console.log('Setting destination in navigation manager...');
         this.navigationManager.setDestination(coords);
+        
+        console.log('Showing navigation modal...');
         this.showNavigationModal(() => {
-            this.navigationManager.startNavigation();
+            console.log('Navigation confirmed, starting navigation...');
+            const success = this.navigationManager.startNavigation();
+            if (!success) {
+                console.error('Navigation start failed');
+            } else {
+                console.log('Navigation started successfully');
+            }
         });
     }
 
     showNavigationModal(onConfirm) {
+        console.log('Creating/showing navigation modal...');
+        
         let modal = document.getElementById('navigation-modal');
         if (!modal) {
+            console.log('Creating new navigation modal...');
             modal = document.createElement('div');
             modal.id = 'navigation-modal';
             modal.innerHTML = `
@@ -147,16 +175,31 @@ export class UIManager {
                 </div>
             `;
             document.body.appendChild(modal);
-        } else {
-            modal.style.display = 'block';
+            console.log('Navigation modal created and added to DOM');
         }
         
-        document.getElementById('modal-yes').onclick = () => {
-            modal.style.display = 'none';
-            onConfirm();
-        };
-        document.getElementById('modal-cancel').onclick = () => {
-            modal.style.display = 'none';
-        };
+        modal.classList.add('show');
+        console.log('Navigation modal shown');
+        
+        // Add event listeners
+        const yesBtn = document.getElementById('modal-yes');
+        const cancelBtn = document.getElementById('modal-cancel');
+        
+        if (yesBtn) {
+            yesBtn.onclick = () => {
+                console.log('Navigation confirmed by user');
+                modal.classList.remove('show');
+                onConfirm();
+            };
+        }
+        
+        if (cancelBtn) {
+            cancelBtn.onclick = () => {
+                console.log('Navigation cancelled by user');
+                modal.classList.remove('show');
+            };
+        }
+        
+        console.log('Navigation modal event listeners attached');
     }
 } 

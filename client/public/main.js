@@ -7,8 +7,8 @@ let map = null;
 let navigationManager = null;
 let uiManager = null;
 
-// Fallback location (Schwanenhöfe)
-const fallbackLocation = [6.8143, 51.2187];
+// Remove fallback location - only use actual user location
+// const fallbackLocation = [6.8143, 51.2187];
 
 async function renderApp() {
     try {
@@ -60,11 +60,11 @@ function initAppLogic() {
     console.log('Mapbox access token set:', mapboxgl.accessToken ? 'Yes' : 'No');
     console.log('Token preview:', mapboxgl.accessToken.substring(0, 20) + '...');
 
-    // Initialize map
+    // Initialize map with a default center (will be updated when user location is available)
     map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/light-v11',
-        center: fallbackLocation,
+        center: [6.8143, 51.2187], // Default center, will be updated with user location
         zoom: 17.257060940340775,
         pitch: 45,
         bearing: -17.6,
@@ -76,6 +76,9 @@ function initAppLogic() {
     // Initialize managers
     navigationManager = new NavigationManager(map, mapboxgl);
     uiManager = new UIManager(navigationManager);
+    
+    console.log('Navigation manager initialized:', navigationManager);
+    console.log('UI manager initialized:', uiManager);
 
     // Initialize 3D buildings and markers
     initMapFeatures();
@@ -92,6 +95,48 @@ function initAppLogic() {
     document.documentElement.style.overflowX = 'hidden';
     document.body.style.width = '100vw';
     document.documentElement.style.width = '100vw';
+    
+    console.log('App initialization completed');
+
+    // Add global test function
+    window.testLocation = () => {
+        this.navigationManager.testLocation();
+    };
+    
+    // Add global navigation test function
+    window.testNavigation = () => {
+        console.log('=== NAVIGATION TEST ===');
+        console.log('Navigation manager:', navigationManager);
+        console.log('UI manager:', uiManager);
+        console.log('Map:', map);
+        console.log('Mapbox access token:', mapboxgl.accessToken);
+        
+        if (navigationManager) {
+            navigationManager.testLocation();
+        } else {
+            console.error('Navigation manager not initialized');
+        }
+    };
+    
+    // Add global manual navigation test function
+    window.testManualNavigation = () => {
+        console.log('=== MANUAL NAVIGATION TEST ===');
+        
+        if (!navigationManager) {
+            console.error('Navigation manager not initialized');
+            return;
+        }
+        
+        // Set a test destination (WHU building)
+        const testDestination = [6.8147, 51.2193];
+        console.log('Setting test destination:', testDestination);
+        navigationManager.setDestination(testDestination);
+        
+        // Try to start navigation
+        console.log('Starting test navigation...');
+        const success = navigationManager.startNavigation();
+        console.log('Navigation start result:', success);
+    };
 }
 
 function initMapFeatures() {
@@ -228,6 +273,35 @@ function addBuildingMarkers(labelLayerId) {
 function initGeolocation() {
     if ('geolocation' in navigator) {
         console.log('Geolocation available, starting location tracking...');
+        
+        // First, get initial position
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const loc = [position.coords.longitude, position.coords.latitude];
+                console.log('Initial location received:', loc);
+                console.log('Accuracy:', position.coords.accuracy, 'meters');
+                
+                // Update map center to user location
+                map.flyTo({ 
+                    center: loc, 
+                    zoom: 18,
+                    duration: 2000
+                });
+                
+                navigationManager.setUserLocation(loc);
+            },
+            error => {
+                console.error('Error getting initial location:', error);
+                alert('Unable to get your location. Please allow location access to use navigation features.');
+            },
+            { 
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: 10000
+            }
+        );
+        
+        // Then start watching for position updates
         navigator.geolocation.watchPosition(
             position => {
                 const loc = [position.coords.longitude, position.coords.latitude];
@@ -249,9 +323,8 @@ function initGeolocation() {
                 }
             },
             error => {
-                console.error('Error getting location:', error);
-                console.log('Using fallback location:', fallbackLocation);
-                navigationManager.setUserLocation(fallbackLocation);
+                console.error('Error getting location update:', error);
+                // Don't set fallback location - just log the error
             },
             { 
                 enableHighAccuracy: true,
@@ -260,8 +333,8 @@ function initGeolocation() {
             }
         );
     } else {
-        console.log('Geolocation not available, using fallback location:', fallbackLocation);
-        navigationManager.setUserLocation(fallbackLocation);
+        console.log('Geolocation not available');
+        alert('Geolocation is not available in your browser. Navigation features will not work.');
     }
 }
 
