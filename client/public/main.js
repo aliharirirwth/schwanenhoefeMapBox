@@ -1,5 +1,25 @@
 import { companies, buildingNumbers } from './companies.js';
 
+// Global utility functions
+function calculateDistance(coord1, coord2) {
+    const R = 6371e3; // Earth's radius in meters
+    const φ1 = coord1[1] * Math.PI / 180;
+    const φ2 = coord2[1] * Math.PI / 180;
+    const Δφ = (coord2[1] - coord1[1]) * Math.PI / 180;
+    const Δλ = (coord2[0] - coord1[0]) * Math.PI / 180;
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // Distance in meters
+}
+
+// Global navigation state
+let navigationActive = false;
+let currentRoute = null;
+
 // Utility to load HTML components
 async function loadComponent(path) {
     try {
@@ -65,22 +85,6 @@ function initAppLogic() {
             panel.classList.toggle('closed');
         }
     };
-
-    // Add the missing calculateDistance function
-    function calculateDistance(coord1, coord2) {
-        const R = 6371e3; // Earth's radius in meters
-        const φ1 = coord1[1] * Math.PI / 180;
-        const φ2 = coord2[1] * Math.PI / 180;
-        const Δφ = (coord2[1] - coord1[1]) * Math.PI / 180;
-        const Δλ = (coord2[0] - coord1[0]) * Math.PI / 180;
-
-        const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-                  Math.cos(φ1) * Math.cos(φ2) *
-                  Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        return R * c; // Distance in meters
-    }
 
     // Set your Mapbox access token
     mapboxgl.accessToken = 'pk.eyJ1Ijoic2VyaHV6IiwiYSI6ImNseXpvc3RlczJpbnIya3FscDU2aHc5d3EifQ.FHtPjde_lqensSHZxqthgw';
@@ -386,21 +390,34 @@ function initAppLogic() {
             .addTo(map);
     }
 
-    // Remove simulation logic
-    // Navigation is now user-centric and real-world only
-    let navigationActive = false;
-    let currentRoute = null;
-
     // Draw navigation route with gradient from user's current location
     function drawRoute() {
-        if (!selectedDestination || !userCurrentLocation) return;
+        if (!selectedDestination || !userCurrentLocation) {
+            console.error('Missing destination or user location for route drawing');
+            return;
+        }
+        
         const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${userCurrentLocation[0]},${userCurrentLocation[1]};${selectedDestination[0]},${selectedDestination[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+        
+        console.log('Drawing route from', userCurrentLocation, 'to', selectedDestination);
+        
         fetch(url)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Directions API error: ${res.status} ${res.statusText}`);
+                }
+                return res.json();
+            })
             .then(json => {
+                if (!json.routes || json.routes.length === 0) {
+                    throw new Error('No route found');
+                }
+                
                 const data = json.routes[0].geometry;
                 currentRoute = json.routes[0];
                 traveledPath = [userCurrentLocation];
+
+                console.log('Route drawn successfully:', currentRoute);
 
                 // Add or update route with gradient
                 if (!map.getSource('route')) {
@@ -433,11 +450,17 @@ function initAppLogic() {
                 destinationMarker = new mapboxgl.Marker({ color: 'red' })
                     .setLngLat(selectedDestination)
                     .addTo(map);
+            })
+            .catch(error => {
+                console.error('Error drawing route:', error);
+                // Show error to user
+                alert('Error drawing route: ' + error.message);
             });
     }
 
     // Start navigation: draw route and activate navigation mode
     function startNavigation() {
+        console.log('Starting navigation to:', selectedDestination);
         navigationActive = true;
         drawRoute();
         attachEndNavigationToMarker();
