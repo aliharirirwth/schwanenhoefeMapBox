@@ -1,0 +1,30 @@
+{
+  "name": "schwanenhoefe-mapbox-3d",
+  "version": "1.0.0",
+  "description": "Schwanenhöfe 3D Buildings Map Application using MapBox GL JS",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "build": "echo 'No build step required for static files'",
+    "deploy": "echo 'Deployment handled by GitHub Actions'"
+  },
+  "keywords": [
+    "mapbox",
+    "3d",
+    "buildings",
+    "schwanenhoefe",
+    "interactive",
+    "map"
+  ],
+  "author": "Ali Hariri",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aliharirirwth/schwanenhoefeMapBox.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aliharirirwth/schwanenhoefeMapBox/issues"
+  },
+  "homepage": "https://aliharirirwth.github.io/schwanenhoefeMapBox"
+} 
