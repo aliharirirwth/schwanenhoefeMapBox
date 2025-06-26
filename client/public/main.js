@@ -192,6 +192,7 @@ function initMapFeatures() {
 
         // Add triangle icons and building labels
         addBuildingMarkers(labelLayerId);
+        addEntranceVerificationMarkers();
     });
 }
 
@@ -266,6 +267,18 @@ function addBuildingMarkers(labelLayerId) {
                     'text-halo-width': 1
                 }
             }, labelLayerId);
+        });
+    });
+}
+
+function addEntranceVerificationMarkers() {
+    import('./companies.js').then(module => {
+        const { entrances } = module;
+        entrances.forEach(e => {
+            new mapboxgl.Marker({ color: 'blue' })
+                .setLngLat([e.longitude, e.latitude])
+                .setPopup(new mapboxgl.Popup().setText(`${e.entrance_code} (${e.building_label})`))
+                .addTo(map);
         });
     });
 }
