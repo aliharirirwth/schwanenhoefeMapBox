@@ -64,11 +64,13 @@ export class UIManager {
         
         companiesToRender.forEach(c => {
             const btn = document.createElement('button');
-            btn.className = 'company-circle company-btn';
+            btn.className = 'company-btn';
             btn.innerHTML = `
-                <img class="company-logo" src="${c.logo ? './' + c.logo : './image_logos/default.png'}" alt="${c.name}" />
-                <div class="company-info-row">
-                  <span class="company-name">${c.name}</span>
+                <div class="company-circle">
+                    <img class="company-logo" src="${c.logo ? './' + c.logo : './image_logos/default.png'}" alt="${c.name}" />
+                    <div class="company-info-row">
+                        <span class="company-name">${c.name}</span>
+                    </div>
                 </div>
             `;
             btn.onclick = () => {

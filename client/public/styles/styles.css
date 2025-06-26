@@ -346,11 +346,15 @@ body {
     overflow-x: auto;
     gap: 1.2rem;
     margin: 0 1rem 1.2rem 1rem;
-    padding: 0.5rem 0.5rem 1rem 0.5rem;
+    padding: 1rem 0.5rem;
     width: calc(100% - 2rem);
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
+    background: #f8f8f8;
+    border-radius: 12px;
+    position: relative;
+    min-height: 120px;
 }
 
 .most-visited::-webkit-scrollbar {
@@ -363,19 +367,20 @@ body {
     align-items: center;
     justify-content: center;
     width: 100%;
-    margin-bottom: 0.2em;
+    margin-top: 0.5rem;
 }
 
 .company-name {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #333;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 80px;
+    max-width: 70px;
     line-height: 1.2;
     font-weight: 500;
+    margin-top: 0.3rem;
 }
 
 .company-building {
@@ -390,66 +395,112 @@ body {
 }
 
 .company-logo {
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
     object-fit: contain;
     border-radius: 50%;
     background: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    margin-bottom: 0.5rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
     display: block;
-    margin-left: auto;
-    margin-right: auto;
-    max-width: 100%;
-    max-height: 100%;
+    margin: 0 auto;
+    border: 2px solid #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .company-circle {
     min-width: 80px;
-    max-width: 100px;
-    padding: 0.5rem 0.3rem;
+    max-width: 90px;
+    padding: 0.8rem 0.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+}
+
+.company-circle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.company-circle:hover .company-logo {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.company-btn {
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.company-btn.selected .company-circle {
+    background: #e3f2fd;
+    border-color: #2196F3;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+}
+
+.company-btn.selected .company-logo {
+    border-color: #2196F3;
 }
 
 @media (max-width: 600px) {
+    .company-logo {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .company-name {
+        font-size: 0.75rem;
+        max-width: 65px;
+    }
+    
+    .company-circle {
+        min-width: 75px;
+        max-width: 85px;
+        padding: 0.6rem 0.4rem;
+    }
+    
+    .most-visited {
+        min-height: 110px;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
     .company-logo {
         width: 40px;
         height: 40px;
     }
     
     .company-name {
-        font-size: 0.8rem;
-        max-width: 70px;
-    }
-    
-    .company-circle {
-        min-width: 70px;
-        max-width: 85px;
-    }
-}
-
-@media (max-width: 480px) {
-    .company-logo {
-        width: 36px;
-        height: 36px;
-    }
-    
-    .company-name {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         max-width: 60px;
     }
     
     .company-circle {
-        min-width: 60px;
-        max-width: 75px;
+        min-width: 70px;
+        max-width: 80px;
+        padding: 0.5rem 0.3rem;
     }
     
     .most-visited {
         gap: 0.8rem;
         margin: 0 0.5rem 1rem 0.5rem;
         width: calc(100% - 1rem);
+        min-height: 100px;
     }
 }
 
@@ -652,12 +703,14 @@ body {
     border: none;
     background: transparent;
     padding: 0;
-    margin: 0 0.3rem;
+    margin: 0;
     cursor: pointer;
     outline: none;
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
+    height: 100%;
 }
 /* Modal styles */
 #navigation-modal {
