@@ -19,7 +19,7 @@ export class UIManager {
                 // Filter companies
                 const filteredCompanies = companies.filter(c => {
                     const nameMatch = c.name.toLowerCase().includes(val);
-                    const buildingMatch = c.building.toLowerCase().includes(val);
+                    const buildingMatch = c.building_code.toLowerCase().includes(val);
                     return nameMatch || buildingMatch;
                 });
                 
@@ -69,7 +69,6 @@ export class UIManager {
                 <img class="company-logo" src="${c.logo ? './' + c.logo : './image_logos/default.png'}" alt="${c.name}" />
                 <div class="company-info-row">
                   <span class="company-name">${c.name}</span>
-                  <span class="company-building">${c.building_code}</span>
                 </div>
             `;
             btn.onclick = () => {
