@@ -49,6 +49,8 @@ export const buildingNumbers = [
 
 // Entrances (red triangles) based on the map
 export const entrances = [
+  { entrance_code: "224A", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.21946253446252, longitude: 6.814624793879717 },
+  { entrance_code: "228B", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.21960018501924, longitude: 6.815659027163131 },
   { entrance_code: "216A", building_label: "GEBÄUDE 2", showTriangle: true, latitude: 51.2198, longitude: 6.8144 },
   { entrance_code: "216B", building_label: "GEBÄUDE 2", showTriangle: true, latitude: 51.21985, longitude: 6.81445 },
   { entrance_code: "218A", building_label: "GEBÄUDE 1", showTriangle: true, latitude: 51.2199, longitude: 6.8145 },
@@ -57,13 +59,11 @@ export const entrances = [
   { entrance_code: "220B", building_label: "GEBÄUDE 3", showTriangle: true, latitude: 51.22005, longitude: 6.81465 },
   { entrance_code: "222", building_label: "GEBÄUDE 9", showTriangle: true, latitude: 51.2201, longitude: 6.8147 },
   { entrance_code: "224", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.22015, longitude: 6.81475 },
-  { entrance_code: "224A", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.2202, longitude: 6.8148 },
   { entrance_code: "224B", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.22025, longitude: 6.81485 },
   { entrance_code: "224C", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.2203, longitude: 6.8149 },
   { entrance_code: "224D", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.22035, longitude: 6.81495 },
   { entrance_code: "226", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.2204, longitude: 6.8150 },
   { entrance_code: "228A", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.22045, longitude: 6.81505 },
-  { entrance_code: "228B", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.2205, longitude: 6.8151 },
   { entrance_code: "228C", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.22055, longitude: 6.81515 },
   { entrance_code: "228D", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.2206, longitude: 6.8152 },
   { entrance_code: "230", building_label: "GEBÄUDE 5.2", showTriangle: true, latitude: 51.22065, longitude: 6.81525 },
