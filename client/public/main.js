@@ -196,16 +196,16 @@ function initMapFeatures() {
 }
 
 function addBuildingMarkers(labelLayerId) {
-    // Import companies for building markers
+    // Import entrances for building markers
     import('./companies.js').then(module => {
-        const { companies } = module;
+        const { entrances } = module;
         
-        const arrowFeatures = companies
-            .filter(c => c.showTriangle)
-            .map(c => ({
-                coordinates: [c.longitude, c.latitude],
+        const arrowFeatures = entrances
+            .filter(e => e.showTriangle)
+            .map(e => ({
+                coordinates: [e.longitude, e.latitude],
                 direction: 120,
-                label: c.building
+                label: e.entrance_code
             }));
 
         map.loadImage('triangle.png', (error, image) => {

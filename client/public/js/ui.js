@@ -67,8 +67,10 @@ export class UIManager {
             btn.className = 'company-circle company-btn';
             btn.innerHTML = `
                 <img class="company-logo" src="${c.logo ? './' + c.logo : './image_logos/default.png'}" alt="${c.name}" />
-                <div class="company-name">${c.name}</div>
-                <div class="company-building">${c.building_code}</div>
+                <div class="company-info-row">
+                  <span class="company-name">${c.name}</span>
+                  <span class="company-building">${c.building_code}</span>
+                </div>
             `;
             btn.onclick = () => {
                 document.querySelectorAll('.company-btn').forEach(b => b.classList.remove('selected'));
