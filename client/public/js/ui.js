@@ -65,7 +65,11 @@ export class UIManager {
         companiesToRender.forEach(c => {
             const btn = document.createElement('button');
             btn.className = 'company-circle company-btn';
-            btn.innerHTML = `<img class="company-logo" src="./${c.logo}" alt="${c.name}" /><div class="company-name">${c.name}</div>`;
+            btn.innerHTML = `
+                <img class="company-logo" src="${c.logo ? './' + c.logo : './image_logos/default.png'}" alt="${c.name}" />
+                <div class="company-name">${c.name}</div>
+                <div class="company-building">${c.building_code}</div>
+            `;
             btn.onclick = () => {
                 document.querySelectorAll('.company-btn').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
@@ -107,14 +111,12 @@ export class UIManager {
             btn.textContent = num;
             
             // Find companies in this building
-            const buildingCompanies = companies.filter(c => c.building === num);
+            const buildingCompanies = companies.filter(c => c.building_code.includes(num));
             
             btn.onclick = () => {
                 document.querySelectorAll('.company-grid-btn').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
-                
-                // If there are companies in this building, use the first one's coordinates
-                // Otherwise use the default location
+                // Use the first company's coordinates for this building
                 const company = buildingCompanies[0];
                 let coords = company ? [company.longitude, company.latitude] : [6.8143, 51.2187];
                 this.handleDestinationSelection(coords);
