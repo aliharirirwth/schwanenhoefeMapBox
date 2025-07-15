@@ -200,9 +200,9 @@ function addBuildingMarkers(labelLayerId) {
     import('./companies.js').then(module => {
         const { entrances } = module;
         
-        console.log('Adding building markers for entrances:', entrances);
+        console.log('Adding building entrance markers:', entrances);
         
-        // Create red arrow markers for building entrances (replacing green "X")
+        // Create red arrow markers for building entrances
         const arrowFeatures = entrances
             .filter(e => e.showTriangle)
             .map(e => ({
@@ -285,108 +285,8 @@ function addBuildingMarkers(labelLayerId) {
             }, labelLayerId);
             
             console.log('Red arrow labels layer added');
+            console.log('Entrance markers added successfully');
         });
-
-        // Add red dashed line connecting buildings in sequence
-        const sortedEntrances = entrances
-            .filter(e => e.showTriangle)
-            .sort((a, b) => {
-                // Sort by building number (extract number and letter)
-                const aMatch = a.entrance_code.match(/(\d+)([A-Za-z]*)/);
-                const bMatch = b.entrance_code.match(/(\d+)([A-Za-z]*)/);
-                
-                if (!aMatch || !bMatch) return 0;
-                
-                const aNum = parseInt(aMatch[1]);
-                const bNum = parseInt(bMatch[1]);
-                const aLetter = aMatch[2] || '';
-                const bLetter = bMatch[2] || '';
-                
-                // First compare numbers
-                if (aNum !== bNum) return aNum - bNum;
-                // Then compare letters
-                return aLetter.localeCompare(bLetter);
-            });
-
-        // Create path coordinates
-        const pathCoordinates = sortedEntrances.map(e => [e.longitude, e.latitude]);
-        
-        // Add red dashed line
-        if (pathCoordinates.length > 1) {
-            map.addSource('building-path', {
-                type: 'geojson',
-                data: {
-                    type: 'Feature',
-                    geometry: {
-                        type: 'LineString',
-                        coordinates: pathCoordinates
-                    }
-                }
-            });
-
-            map.addLayer({
-                id: 'building-path-line',
-                type: 'line',
-                source: 'building-path',
-                layout: {
-                    'line-join': 'round',
-                    'line-cap': 'round'
-                },
-                paint: {
-                    'line-color': '#ff0000',
-                    'line-width': 3,
-                    'line-dasharray': [2, 2]
-                }
-            }, labelLayerId);
-
-            // Add red circular markers along the path
-            sortedEntrances.forEach((entrance, index) => {
-                const circleMarker = document.createElement('div');
-                circleMarker.style.cssText = `
-                    width: 8px;
-                    height: 8px;
-                    background: #ff0000;
-                    border: 2px solid white;
-                    border-radius: 50%;
-                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-                `;
-                
-                // Create label for path marker
-                const pathLabel = document.createElement('div');
-                pathLabel.style.cssText = `
-                    position: absolute;
-                    top: -15px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: #ff0000;
-                    color: white;
-                    padding: 1px 4px;
-                    border-radius: 3px;
-                    font-size: 8px;
-                    font-weight: bold;
-                    white-space: nowrap;
-                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-                    z-index: 1000;
-                `;
-                pathLabel.textContent = entrance.entrance_code;
-                
-                // Create container for path marker and label
-                const pathContainer = document.createElement('div');
-                pathContainer.appendChild(circleMarker);
-                pathContainer.appendChild(pathLabel);
-                
-                // Add path marker to map
-                const pathMarker = new mapboxgl.Marker({ element: pathContainer })
-                    .setLngLat([entrance.longitude, entrance.latitude])
-                    .addTo(map);
-                
-                console.log(`Added red path marker for ${entrance.entrance_code}`);
-            });
-
-            console.log('Red dashed path with building codes added successfully');
-        }
-
-        console.log('Red arrow entrance markers added successfully');
     });
 }
 
