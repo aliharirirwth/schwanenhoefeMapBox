@@ -202,63 +202,90 @@ function addBuildingMarkers(labelLayerId) {
         
         console.log('Adding building markers for entrances:', entrances);
         
-        // Create green "X" markers for building entrances
-        entrances
+        // Create red arrow markers for building entrances (replacing green "X")
+        const arrowFeatures = entrances
             .filter(e => e.showTriangle)
-            .forEach(entrance => {
-                // Create custom green "X" marker element
-                const markerElement = document.createElement('div');
-                markerElement.style.cssText = `
-                    width: 24px;
-                    height: 24px;
-                    background: #4CAF50;
-                    border: 3px solid white;
-                    border-radius: 50%;
-                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-                    position: relative;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    font-weight: bold;
-                    color: white;
-                    font-size: 12px;
-                    font-family: Arial, sans-serif;
-                `;
-                
-                // Add "X" text
-                markerElement.textContent = 'X';
-                
-                // Create label element
-                const labelElement = document.createElement('div');
-                labelElement.style.cssText = `
-                    position: absolute;
-                    top: -25px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: #4CAF50;
-                    color: white;
-                    padding: 2px 6px;
-                    border-radius: 4px;
-                    font-size: 10px;
-                    font-weight: bold;
-                    white-space: nowrap;
-                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-                    z-index: 1000;
-                `;
-                labelElement.textContent = entrance.entrance_code;
-                
-                // Create container for marker and label
-                const container = document.createElement('div');
-                container.appendChild(markerElement);
-                container.appendChild(labelElement);
-                
-                // Add marker to map
-                const marker = new mapboxgl.Marker({ element: container })
-                    .setLngLat([entrance.longitude, entrance.latitude])
-                    .addTo(map);
-                
-                console.log(`Added green "X" marker for ${entrance.entrance_code} at [${entrance.longitude}, ${entrance.latitude}]`);
-            });
+            .map(e => ({
+                coordinates: [e.longitude, e.latitude],
+                direction: 120,
+                label: e.entrance_code
+            }));
+
+        console.log('Arrow features to add:', arrowFeatures);
+
+        map.loadImage('triangle.png', (error, image) => {
+            if (error) {
+                console.error('Error loading triangle image:', error);
+                return;
+            }
+            
+            console.log('Triangle image loaded successfully');
+            
+            if (!map.hasImage('arrow-icon')) {
+                map.addImage('arrow-icon', image, { sdf: false });
+                console.log('Arrow icon added to map');
+            }
+            
+            const arrowGeoJSON = {
+                type: 'FeatureCollection',
+                features: arrowFeatures.map(obj => ({
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: obj.coordinates },
+                    properties: { direction: obj.direction, label: obj.label }
+                }))
+            };
+            
+            console.log('Arrow GeoJSON:', arrowGeoJSON);
+            
+            if (!map.getSource('arrows')) {
+                map.addSource('arrows', { type: 'geojson', data: arrowGeoJSON });
+                console.log('Arrow source added to map');
+            }
+            
+            map.addLayer({
+                id: 'arrow-symbols',
+                type: 'symbol',
+                source: 'arrows',
+                layout: {
+                    'icon-image': 'arrow-icon',
+                    'icon-size': 1.2,
+                    'icon-offset': [0, -20],
+                    'icon-allow-overlap': true,
+                    'icon-rotate': ['get', 'direction'],
+                    'icon-rotation-alignment': 'map',
+                    'icon-anchor': 'top',
+                    'text-optional': true,
+                },
+                paint: {
+                    'icon-color': '#ff0000', // Make it red
+                    'icon-opacity': 0.9
+                }
+            }, labelLayerId);
+            
+            console.log('Red arrow symbols layer added');
+            
+            map.addLayer({
+                id: 'arrow-labels',
+                type: 'symbol',
+                source: 'arrows',
+                layout: {
+                    'text-field': ['get', 'label'],
+                    'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                    'text-size': 16,
+                    'text-offset': [0, 1.5],
+                    'text-anchor': 'top',
+                    'text-allow-overlap': true,
+                    'text-ignore-placement': true
+                },
+                paint: {
+                    'text-color': '#ff0000', // Make text red to match
+                    'text-halo-color': '#ffffff',
+                    'text-halo-width': 2
+                }
+            }, labelLayerId);
+            
+            console.log('Red arrow labels layer added');
+        });
 
         // Add red dashed line connecting buildings in sequence
         const sortedEntrances = entrances
@@ -359,7 +386,7 @@ function addBuildingMarkers(labelLayerId) {
             console.log('Red dashed path with building codes added successfully');
         }
 
-        console.log('Green "X" markers added successfully');
+        console.log('Red arrow entrance markers added successfully');
     });
 }
 
