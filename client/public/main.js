@@ -202,99 +202,164 @@ function addBuildingMarkers(labelLayerId) {
         
         console.log('Adding building markers for entrances:', entrances);
         
-        const arrowFeatures = entrances
+        // Create green "X" markers for building entrances
+        entrances
             .filter(e => e.showTriangle)
-            .map(e => ({
-                coordinates: [e.longitude, e.latitude],
-                direction: 120,
-                label: e.entrance_code
-            }));
+            .forEach(entrance => {
+                // Create custom green "X" marker element
+                const markerElement = document.createElement('div');
+                markerElement.style.cssText = `
+                    width: 24px;
+                    height: 24px;
+                    background: #4CAF50;
+                    border: 3px solid white;
+                    border-radius: 50%;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                    color: white;
+                    font-size: 12px;
+                    font-family: Arial, sans-serif;
+                `;
+                
+                // Add "X" text
+                markerElement.textContent = 'X';
+                
+                // Create label element
+                const labelElement = document.createElement('div');
+                labelElement.style.cssText = `
+                    position: absolute;
+                    top: -25px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #4CAF50;
+                    color: white;
+                    padding: 2px 6px;
+                    border-radius: 4px;
+                    font-size: 10px;
+                    font-weight: bold;
+                    white-space: nowrap;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+                    z-index: 1000;
+                `;
+                labelElement.textContent = entrance.entrance_code;
+                
+                // Create container for marker and label
+                const container = document.createElement('div');
+                container.appendChild(markerElement);
+                container.appendChild(labelElement);
+                
+                // Add marker to map
+                const marker = new mapboxgl.Marker({ element: container })
+                    .setLngLat([entrance.longitude, entrance.latitude])
+                    .addTo(map);
+                
+                console.log(`Added green "X" marker for ${entrance.entrance_code} at [${entrance.longitude}, ${entrance.latitude}]`);
+            });
 
-        console.log('Arrow features to add:', arrowFeatures);
+        // Add red dashed line connecting buildings in sequence
+        const sortedEntrances = entrances
+            .filter(e => e.showTriangle)
+            .sort((a, b) => {
+                // Sort by building number (extract number and letter)
+                const aMatch = a.entrance_code.match(/(\d+)([A-Za-z]*)/);
+                const bMatch = b.entrance_code.match(/(\d+)([A-Za-z]*)/);
+                
+                if (!aMatch || !bMatch) return 0;
+                
+                const aNum = parseInt(aMatch[1]);
+                const bNum = parseInt(bMatch[1]);
+                const aLetter = aMatch[2] || '';
+                const bLetter = bMatch[2] || '';
+                
+                // First compare numbers
+                if (aNum !== bNum) return aNum - bNum;
+                // Then compare letters
+                return aLetter.localeCompare(bLetter);
+            });
 
-        // Add a test marker to verify coordinates are working
-        const testEntrance = entrances.find(e => e.entrance_code === "228A");
-        if (testEntrance) {
-            console.log('Adding test marker at:', testEntrance);
-            const testMarker = new mapboxgl.Marker({ color: '#ff0000' })
-                .setLngLat([testEntrance.longitude, testEntrance.latitude])
-                .addTo(map);
-            console.log('Test marker added');
+        // Create path coordinates
+        const pathCoordinates = sortedEntrances.map(e => [e.longitude, e.latitude]);
+        
+        // Add red dashed line
+        if (pathCoordinates.length > 1) {
+            map.addSource('building-path', {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: pathCoordinates
+                    }
+                }
+            });
+
+            map.addLayer({
+                id: 'building-path-line',
+                type: 'line',
+                source: 'building-path',
+                layout: {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                paint: {
+                    'line-color': '#ff0000',
+                    'line-width': 3,
+                    'line-dasharray': [2, 2]
+                }
+            }, labelLayerId);
+
+            // Add red circular markers along the path
+            sortedEntrances.forEach((entrance, index) => {
+                const circleMarker = document.createElement('div');
+                circleMarker.style.cssText = `
+                    width: 8px;
+                    height: 8px;
+                    background: #ff0000;
+                    border: 2px solid white;
+                    border-radius: 50%;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+                `;
+                
+                // Create label for path marker
+                const pathLabel = document.createElement('div');
+                pathLabel.style.cssText = `
+                    position: absolute;
+                    top: -15px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #ff0000;
+                    color: white;
+                    padding: 1px 4px;
+                    border-radius: 3px;
+                    font-size: 8px;
+                    font-weight: bold;
+                    white-space: nowrap;
+                    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+                    z-index: 1000;
+                `;
+                pathLabel.textContent = entrance.entrance_code;
+                
+                // Create container for path marker and label
+                const pathContainer = document.createElement('div');
+                pathContainer.appendChild(circleMarker);
+                pathContainer.appendChild(pathLabel);
+                
+                // Add path marker to map
+                const pathMarker = new mapboxgl.Marker({ element: pathContainer })
+                    .setLngLat([entrance.longitude, entrance.latitude])
+                    .addTo(map);
+                
+                console.log(`Added red path marker for ${entrance.entrance_code}`);
+            });
+
+            console.log('Red dashed path with building codes added successfully');
         }
 
-        map.loadImage('triangle.png', (error, image) => {
-            if (error) {
-                console.error('Error loading triangle image:', error);
-                return;
-            }
-            
-            console.log('Triangle image loaded successfully');
-            
-            if (!map.hasImage('arrow-icon')) {
-                map.addImage('arrow-icon', image, { sdf: false });
-                console.log('Arrow icon added to map');
-            }
-            
-            const arrowGeoJSON = {
-                type: 'FeatureCollection',
-                features: arrowFeatures.map(obj => ({
-                    type: 'Feature',
-                    geometry: { type: 'Point', coordinates: obj.coordinates },
-                    properties: { direction: obj.direction, label: obj.label }
-                }))
-            };
-            
-            console.log('Arrow GeoJSON:', arrowGeoJSON);
-            
-            if (!map.getSource('arrows')) {
-                map.addSource('arrows', { type: 'geojson', data: arrowGeoJSON });
-                console.log('Arrow source added to map');
-            }
-            
-            map.addLayer({
-                id: 'arrow-symbols',
-                type: 'symbol',
-                source: 'arrows',
-                layout: {
-                    'icon-image': 'arrow-icon',
-                    'icon-size': 1.2, // Increased from 0.7 to make more visible
-                    'icon-offset': [0, -20], // Increased offset
-                    'icon-allow-overlap': true,
-                    'icon-rotate': ['get', 'direction'],
-                    'icon-rotation-alignment': 'map',
-                    'icon-anchor': 'top',
-                    'text-optional': true,
-                },
-                paint: {
-                    'icon-color': '#ff0000', // Make it red
-                    'icon-opacity': 0.9
-                }
-            }, labelLayerId);
-            
-            console.log('Arrow symbols layer added');
-            
-            map.addLayer({
-                id: 'arrow-labels',
-                type: 'symbol',
-                source: 'arrows',
-                layout: {
-                    'text-field': ['get', 'label'],
-                    'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-                    'text-size': 16, // Increased from 14
-                    'text-offset': [0, 1.5], // Increased offset
-                    'text-anchor': 'top',
-                    'text-allow-overlap': true,
-                    'text-ignore-placement': true
-                },
-                paint: {
-                    'text-color': '#ff0000', // Make text red to match
-                    'text-halo-color': '#ffffff',
-                    'text-halo-width': 2 // Increased halo width
-                }
-            }, labelLayerId);
-            
-            console.log('Arrow labels layer added');
-        });
+        console.log('Green "X" markers added successfully');
     });
 }
 
