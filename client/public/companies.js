@@ -44,32 +44,33 @@ export const companies = [
 
 // Unique building numbers for grid/list
 export const buildingNumbers = [
-  "216A", "216B", "218A", "218B", "220A", "220B", "222", "224", "224A", "224B", "224C", "224D", "226", "228A", "228B", "228C", "228D", "230", "232", "234A", "234B", "234C", "234D"
+  "216A", "216B", "218A", "218B", "220A", "220B", "220C", "222", "224", "224A", "224B", "224C", "224D", "226", "228A", "228B", "228C", "228D", "230", "232", "234A", "234B", "234C", "234D"
 ];
 
 // Entrances (red triangles) based on the map
 export const entrances = [
-  { entrance_code: "224A", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.21946253446252, longitude: 6.814624793879717 },
-  { entrance_code: "228B", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.21960018501924, longitude: 6.815659027163131 },
   { entrance_code: "216A", building_label: "GEBÄUDE 2", showTriangle: true, latitude: 51.2198, longitude: 6.8144 },
   { entrance_code: "216B", building_label: "GEBÄUDE 2", showTriangle: true, latitude: 51.21985, longitude: 6.81445 },
   { entrance_code: "218A", building_label: "GEBÄUDE 1", showTriangle: true, latitude: 51.2199, longitude: 6.8145 },
   { entrance_code: "218B", building_label: "GEBÄUDE 1", showTriangle: true, latitude: 51.21995, longitude: 6.81455 },
   { entrance_code: "220A", building_label: "GEBÄUDE 3", showTriangle: true, latitude: 51.2200, longitude: 6.8146 },
   { entrance_code: "220B", building_label: "GEBÄUDE 3", showTriangle: true, latitude: 51.22005, longitude: 6.81465 },
-  { entrance_code: "222", building_label: "GEBÄUDE 9", showTriangle: true, latitude: 51.2201, longitude: 6.8147 },
-  { entrance_code: "224", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.22015, longitude: 6.81475 },
-  { entrance_code: "224B", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.22025, longitude: 6.81485 },
-  { entrance_code: "224C", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.2203, longitude: 6.8149 },
-  { entrance_code: "224D", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.22035, longitude: 6.81495 },
-  { entrance_code: "226", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.2204, longitude: 6.8150 },
-  { entrance_code: "228A", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.22045, longitude: 6.81505 },
-  { entrance_code: "228C", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.22055, longitude: 6.81515 },
-  { entrance_code: "228D", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.2206, longitude: 6.8152 },
-  { entrance_code: "230", building_label: "GEBÄUDE 5.2", showTriangle: true, latitude: 51.22065, longitude: 6.81525 },
-  { entrance_code: "232", building_label: "GEBÄUDE 7", showTriangle: true, latitude: 51.2207, longitude: 6.8153 },
-  { entrance_code: "234A", building_label: "GEBÄUDE 6", showTriangle: true, latitude: 51.22075, longitude: 6.81535 },
-  { entrance_code: "234B", building_label: "GEBÄUDE 6", showTriangle: true, latitude: 51.2208, longitude: 6.8154 },
-  { entrance_code: "234C", building_label: "GEBÄUDE 6", showTriangle: true, latitude: 51.22085, longitude: 6.81545 },
-  { entrance_code: "234D", building_label: "GEBÄUDE 6", showTriangle: true, latitude: 51.2209, longitude: 6.8155 }
+  { entrance_code: "220C", building_label: "GEBÄUDE 3", showTriangle: true, latitude: 51.2201, longitude: 6.8147 },
+  { entrance_code: "222", building_label: "GEBÄUDE 9", showTriangle: true, latitude: 51.22015, longitude: 6.81475 },
+  { entrance_code: "224", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.2202, longitude: 6.8148 },
+  { entrance_code: "224A", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.22025, longitude: 6.81485 },
+  { entrance_code: "224B", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.2203, longitude: 6.8149 },
+  { entrance_code: "224C", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.22035, longitude: 6.81495 },
+  { entrance_code: "224D", building_label: "GEBÄUDE 4", showTriangle: true, latitude: 51.2204, longitude: 6.8150 },
+  { entrance_code: "226", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.22045, longitude: 6.81505 },
+  { entrance_code: "228A", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.2205, longitude: 6.8151 },
+  { entrance_code: "228B", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.22055, longitude: 6.81515 },
+  { entrance_code: "228C", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.2206, longitude: 6.8152 },
+  { entrance_code: "228D", building_label: "GEBÄUDE 5.1", showTriangle: true, latitude: 51.22065, longitude: 6.81525 },
+  { entrance_code: "230", building_label: "GEBÄUDE 5.2", showTriangle: true, latitude: 51.2207, longitude: 6.8153 },
+  { entrance_code: "232", building_label: "GEBÄUDE 7", showTriangle: true, latitude: 51.22075, longitude: 6.81535 },
+  { entrance_code: "234A", building_label: "GEBÄUDE 6", showTriangle: true, latitude: 51.2208, longitude: 6.8154 },
+  { entrance_code: "234B", building_label: "GEBÄUDE 6", showTriangle: true, latitude: 51.22085, longitude: 6.81545 },
+  { entrance_code: "234C", building_label: "GEBÄUDE 6", showTriangle: true, latitude: 51.2209, longitude: 6.8155 },
+  { entrance_code: "234D", building_label: "GEBÄUDE 6", showTriangle: true, latitude: 51.22095, longitude: 6.81555 }
 ];
