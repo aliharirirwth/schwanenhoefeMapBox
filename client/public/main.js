@@ -190,103 +190,31 @@ function initMapFeatures() {
             labelLayerId
         );
 
-        // Add triangle icons and building labels
-        addBuildingMarkers(labelLayerId);
+        // Add entrance markers
+        addEntranceMarkers();
     });
 }
 
-function addBuildingMarkers(labelLayerId) {
-    // Import entrances for building markers
+function addEntranceMarkers() {
+    // Import entrances data
     import('./companies.js').then(module => {
         const { entrances } = module;
         
-        console.log('Adding building entrance markers:', entrances);
+        console.log('Adding entrance markers from scratch');
         
-        // Create red arrow markers for building entrances
-        const arrowFeatures = entrances
+        // Create simple red arrow markers for each entrance
+        entrances
             .filter(e => e.showTriangle)
-            .map(e => ({
-                coordinates: [e.longitude, e.latitude],
-                direction: 120,
-                label: e.entrance_code
-            }));
-
-        console.log('Arrow features to add:', arrowFeatures);
-
-        map.loadImage('triangle.png', (error, image) => {
-            if (error) {
-                console.error('Error loading triangle image:', error);
-                return;
-            }
-            
-            console.log('Triangle image loaded successfully');
-            
-            if (!map.hasImage('arrow-icon')) {
-                map.addImage('arrow-icon', image, { sdf: false });
-                console.log('Arrow icon added to map');
-            }
-            
-            const arrowGeoJSON = {
-                type: 'FeatureCollection',
-                features: arrowFeatures.map(obj => ({
-                    type: 'Feature',
-                    geometry: { type: 'Point', coordinates: obj.coordinates },
-                    properties: { direction: obj.direction, label: obj.label }
-                }))
-            };
-            
-            console.log('Arrow GeoJSON:', arrowGeoJSON);
-            
-            if (!map.getSource('arrows')) {
-                map.addSource('arrows', { type: 'geojson', data: arrowGeoJSON });
-                console.log('Arrow source added to map');
-            }
-            
-            map.addLayer({
-                id: 'arrow-symbols',
-                type: 'symbol',
-                source: 'arrows',
-                layout: {
-                    'icon-image': 'arrow-icon',
-                    'icon-size': 1.2,
-                    'icon-offset': [0, -20],
-                    'icon-allow-overlap': true,
-                    'icon-rotate': ['get', 'direction'],
-                    'icon-rotation-alignment': 'map',
-                    'icon-anchor': 'top',
-                    'text-optional': true,
-                },
-                paint: {
-                    'icon-color': '#ff0000', // Make it red
-                    'icon-opacity': 0.9
-                }
-            }, labelLayerId);
-            
-            console.log('Red arrow symbols layer added');
-            
-            map.addLayer({
-                id: 'arrow-labels',
-                type: 'symbol',
-                source: 'arrows',
-                layout: {
-                    'text-field': ['get', 'label'],
-                    'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-                    'text-size': 16,
-                    'text-offset': [0, 1.5],
-                    'text-anchor': 'top',
-                    'text-allow-overlap': true,
-                    'text-ignore-placement': true
-                },
-                paint: {
-                    'text-color': '#ff0000', // Make text red to match
-                    'text-halo-color': '#ffffff',
-                    'text-halo-width': 2
-                }
-            }, labelLayerId);
-            
-            console.log('Red arrow labels layer added');
-            console.log('Entrance markers added successfully');
-        });
+            .forEach(entrance => {
+                // Create a simple red arrow marker
+                const marker = new mapboxgl.Marker({ color: '#ff0000' })
+                    .setLngLat([entrance.longitude, entrance.latitude])
+                    .addTo(map);
+                
+                console.log(`Added entrance marker for ${entrance.entrance_code} at [${entrance.longitude}, ${entrance.latitude}]`);
+            });
+        
+        console.log('Entrance markers added successfully');
     });
 }
 
