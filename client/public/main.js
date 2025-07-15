@@ -200,6 +200,8 @@ function addBuildingMarkers(labelLayerId) {
     import('./companies.js').then(module => {
         const { entrances } = module;
         
+        console.log('Adding building markers for entrances:', entrances);
+        
         const arrowFeatures = entrances
             .filter(e => e.showTriangle)
             .map(e => ({
@@ -208,14 +210,29 @@ function addBuildingMarkers(labelLayerId) {
                 label: e.entrance_code
             }));
 
+        console.log('Arrow features to add:', arrowFeatures);
+
+        // Add a test marker to verify coordinates are working
+        const testEntrance = entrances.find(e => e.entrance_code === "228A");
+        if (testEntrance) {
+            console.log('Adding test marker at:', testEntrance);
+            const testMarker = new mapboxgl.Marker({ color: '#ff0000' })
+                .setLngLat([testEntrance.longitude, testEntrance.latitude])
+                .addTo(map);
+            console.log('Test marker added');
+        }
+
         map.loadImage('triangle.png', (error, image) => {
             if (error) {
                 console.error('Error loading triangle image:', error);
                 return;
             }
             
+            console.log('Triangle image loaded successfully');
+            
             if (!map.hasImage('arrow-icon')) {
                 map.addImage('arrow-icon', image, { sdf: false });
+                console.log('Arrow icon added to map');
             }
             
             const arrowGeoJSON = {
@@ -227,8 +244,11 @@ function addBuildingMarkers(labelLayerId) {
                 }))
             };
             
+            console.log('Arrow GeoJSON:', arrowGeoJSON);
+            
             if (!map.getSource('arrows')) {
                 map.addSource('arrows', { type: 'geojson', data: arrowGeoJSON });
+                console.log('Arrow source added to map');
             }
             
             map.addLayer({
@@ -237,15 +257,21 @@ function addBuildingMarkers(labelLayerId) {
                 source: 'arrows',
                 layout: {
                     'icon-image': 'arrow-icon',
-                    'icon-size': 0.7,
-                    'icon-offset': [0, -15],
+                    'icon-size': 1.2, // Increased from 0.7 to make more visible
+                    'icon-offset': [0, -20], // Increased offset
                     'icon-allow-overlap': true,
                     'icon-rotate': ['get', 'direction'],
                     'icon-rotation-alignment': 'map',
                     'icon-anchor': 'top',
                     'text-optional': true,
+                },
+                paint: {
+                    'icon-color': '#ff0000', // Make it red
+                    'icon-opacity': 0.9
                 }
             }, labelLayerId);
+            
+            console.log('Arrow symbols layer added');
             
             map.addLayer({
                 id: 'arrow-labels',
@@ -254,18 +280,20 @@ function addBuildingMarkers(labelLayerId) {
                 layout: {
                     'text-field': ['get', 'label'],
                     'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-                    'text-size': 14,
-                    'text-offset': [0, 1.2],
+                    'text-size': 16, // Increased from 14
+                    'text-offset': [0, 1.5], // Increased offset
                     'text-anchor': 'top',
                     'text-allow-overlap': true,
                     'text-ignore-placement': true
                 },
                 paint: {
-                    'text-color': '#2c3e50',
+                    'text-color': '#ff0000', // Make text red to match
                     'text-halo-color': '#ffffff',
-                    'text-halo-width': 1
+                    'text-halo-width': 2 // Increased halo width
                 }
             }, labelLayerId);
+            
+            console.log('Arrow labels layer added');
         });
     });
 }
