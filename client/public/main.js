@@ -202,12 +202,61 @@ function addEntranceMarkers() {
         
         console.log('Adding entrance markers from scratch');
         
-        // Create simple red arrow markers for each entrance
+        // Create dynamic red arrow markers for each entrance
         entrances
             .filter(e => e.showTriangle)
             .forEach(entrance => {
-                // Create a simple red arrow marker
-                const marker = new mapboxgl.Marker({ color: '#ff0000' })
+                // Create a dynamic red arrow marker with house number
+                const markerElement = document.createElement('div');
+                markerElement.className = 'entrance-marker';
+                markerElement.innerHTML = `
+                    <div class="arrow-container">
+                        <svg class="arrow-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="#ff0000" stroke="#ffffff" stroke-width="1"/>
+                            <circle cx="12" cy="12" r="10" fill="none" stroke="#ffffff" stroke-width="2"/>
+                        </svg>
+                        <div class="house-number">${entrance.entrance_code}</div>
+                    </div>
+                `;
+                
+                // Add CSS styles for the marker
+                const style = document.createElement('style');
+                style.textContent = `
+                    .entrance-marker {
+                        position: relative;
+                        cursor: pointer;
+                    }
+                    .arrow-container {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        transform: translate(-50%, -50%);
+                    }
+                    .arrow-icon {
+                        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+                        animation: pulse 2s infinite;
+                    }
+                    .house-number {
+                        background: rgba(255, 255, 255, 0.9);
+                        color: #000;
+                        font-weight: bold;
+                        font-size: 12px;
+                        padding: 2px 6px;
+                        border-radius: 4px;
+                        margin-top: 2px;
+                        white-space: nowrap;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+                        border: 1px solid #ccc;
+                    }
+                    @keyframes pulse {
+                        0% { transform: scale(1); }
+                        50% { transform: scale(1.1); }
+                        100% { transform: scale(1); }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                const marker = new mapboxgl.Marker({ element: markerElement })
                     .setLngLat([entrance.longitude, entrance.latitude])
                     .addTo(map);
                 
