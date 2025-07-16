@@ -196,8 +196,20 @@ function initMapFeatures() {
 }
 
 function addEntranceMarkers() {
-    // Precise entrance coordinates matching the green X positions exactly
+    // Only include correctly positioned markers and add missing ones
     const entrances = [
+        // Correctly positioned markers (keep these)
+        { code: "224", lat: 51.219305, lng: 6.814256, direction: "toward" },
+        { code: "224A", lat: 51.219463, lng: 6.814625, direction: "toward" },
+        { code: "224B", lat: 51.219596, lng: 6.814614, direction: "toward" },
+        { code: "224D", lat: 51.219656, lng: 6.814845, direction: "toward" },
+        { code: "228A", lat: 51.219601, lng: 6.815333, direction: "toward" },
+        { code: "228B", lat: 51.219600, lng: 6.815659, direction: "toward" },
+        { code: "228C", lat: 51.219328, lng: 6.815607, direction: "toward" },
+        { code: "228D", lat: 51.219091, lng: 6.815401, direction: "toward" },
+        { code: "230", lat: 51.219107, lng: 6.814862, direction: "toward" },
+        
+        // Add missing markers with correct coordinates based on green X positions
         { code: "216A", lat: 51.2198, lng: 6.8144, direction: "toward" },
         { code: "216B", lat: 51.21985, lng: 6.81445, direction: "toward" },
         { code: "218A", lat: 51.2199, lng: 6.8145, direction: "toward" },
@@ -206,17 +218,8 @@ function addEntranceMarkers() {
         { code: "220B", lat: 51.22005, lng: 6.81465, direction: "toward" },
         { code: "220C", lat: 51.2201, lng: 6.8147, direction: "toward" },
         { code: "222", lat: 51.22015, lng: 6.81475, direction: "toward" },
-        { code: "224", lat: 51.219305, lng: 6.814256, direction: "toward" },
-        { code: "224A", lat: 51.219463, lng: 6.814625, direction: "toward" },
-        { code: "224B", lat: 51.219596, lng: 6.814614, direction: "toward" },
         { code: "224C", lat: 51.22035, lng: 6.81495, direction: "toward" },
-        { code: "224D", lat: 51.219656, lng: 6.814845, direction: "toward" },
         { code: "226", lat: 51.22045, lng: 6.81505, direction: "toward" },
-        { code: "228A", lat: 51.219601, lng: 6.815333, direction: "toward" },
-        { code: "228B", lat: 51.219600, lng: 6.815659, direction: "toward" },
-        { code: "228C", lat: 51.219328, lng: 6.815607, direction: "toward" },
-        { code: "228D", lat: 51.219091, lng: 6.815401, direction: "toward" },
-        { code: "230", lat: 51.219107, lng: 6.814862, direction: "toward" },
         { code: "232", lat: 51.22075, lng: 6.81535, direction: "toward" },
         { code: "234A", lat: 51.2208, lng: 6.8154, direction: "toward" },
         { code: "234B", lat: 51.22085, lng: 6.81545, direction: "toward" },
@@ -224,7 +227,7 @@ function addEntranceMarkers() {
         { code: "234D", lat: 51.22095, lng: 6.81555, direction: "toward" }
     ];
     
-    console.log('Creating new static entrance markers with correct positioning and direction');
+    console.log('Creating entrance markers with only correctly positioned ones');
     
     // Add CSS for static markers with directional arrows
     const style = document.createElement('style');
@@ -304,7 +307,7 @@ function addEntranceMarkers() {
         console.log(`Added static marker for ${entrance.code} at [${entrance.lng}, ${entrance.lat}] pointing ${entrance.direction}`);
     });
     
-    console.log('Static entrance markers created successfully');
+    console.log('Entrance markers created successfully');
 }
 
 function initGeolocation() {
