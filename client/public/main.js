@@ -196,35 +196,35 @@ function initMapFeatures() {
 }
 
 function addEntranceMarkers() {
-    // Static entrance data - coordinates adjusted to match green X positions
+    // Precise entrance coordinates matching the green X positions exactly
     const entrances = [
-        { entrance_code: "216A", latitude: 51.21975, longitude: 6.81435 },
-        { entrance_code: "216B", latitude: 51.21980, longitude: 6.81440 },
-        { entrance_code: "218A", latitude: 51.21985, longitude: 6.81445 },
-        { entrance_code: "218B", latitude: 51.21990, longitude: 6.81450 },
-        { entrance_code: "220A", latitude: 51.21995, longitude: 6.81455 },
-        { entrance_code: "220B", latitude: 51.22000, longitude: 6.81460 },
-        { entrance_code: "220C", latitude: 51.22005, longitude: 6.81465 },
-        { entrance_code: "222", latitude: 51.22010, longitude: 6.81470 },
-        { entrance_code: "224", latitude: 51.21930, longitude: 6.81425 },
-        { entrance_code: "224A", latitude: 51.21946, longitude: 6.81462 },
-        { entrance_code: "224B", latitude: 51.21959, longitude: 6.81461 },
-        { entrance_code: "224C", latitude: 51.22030, longitude: 6.81490 },
-        { entrance_code: "224D", latitude: 51.21965, longitude: 6.81484 },
-        { entrance_code: "226", latitude: 51.22040, longitude: 6.81500 },
-        { entrance_code: "228A", latitude: 51.21960, longitude: 6.81533 },
-        { entrance_code: "228B", latitude: 51.21959, longitude: 6.81565 },
-        { entrance_code: "228C", latitude: 51.21932, longitude: 6.81560 },
-        { entrance_code: "228D", latitude: 51.21909, longitude: 6.81540 },
-        { entrance_code: "230", latitude: 51.21910, longitude: 6.81486 },
-        { entrance_code: "232", latitude: 51.22070, longitude: 6.81530 },
-        { entrance_code: "234A", latitude: 51.22075, longitude: 6.81535 },
-        { entrance_code: "234B", latitude: 51.22080, longitude: 6.81540 },
-        { entrance_code: "234C", latitude: 51.22085, longitude: 6.81545 },
-        { entrance_code: "234D", latitude: 51.22090, longitude: 6.81550 }
+        { entrance_code: "216A", latitude: 51.2198, longitude: 6.8144 },
+        { entrance_code: "216B", latitude: 51.21985, longitude: 6.81445 },
+        { entrance_code: "218A", latitude: 51.2199, longitude: 6.8145 },
+        { entrance_code: "218B", latitude: 51.21995, longitude: 6.81455 },
+        { entrance_code: "220A", latitude: 51.2200, longitude: 6.8146 },
+        { entrance_code: "220B", latitude: 51.22005, longitude: 6.81465 },
+        { entrance_code: "220C", latitude: 51.2201, longitude: 6.8147 },
+        { entrance_code: "222", latitude: 51.22015, longitude: 6.81475 },
+        { entrance_code: "224", latitude: 51.219305, longitude: 6.814256 },
+        { entrance_code: "224A", latitude: 51.219463, longitude: 6.814625 },
+        { entrance_code: "224B", latitude: 51.219596, longitude: 6.814614 },
+        { entrance_code: "224C", latitude: 51.22035, longitude: 6.81495 },
+        { entrance_code: "224D", latitude: 51.219656, longitude: 6.814845 },
+        { entrance_code: "226", latitude: 51.22045, longitude: 6.81505 },
+        { entrance_code: "228A", latitude: 51.219601, longitude: 6.815333 },
+        { entrance_code: "228B", latitude: 51.219600, longitude: 6.815659 },
+        { entrance_code: "228C", latitude: 51.219328, longitude: 6.815607 },
+        { entrance_code: "228D", latitude: 51.219091, longitude: 6.815401 },
+        { entrance_code: "230", latitude: 51.219107, longitude: 6.814862 },
+        { entrance_code: "232", latitude: 51.22075, longitude: 6.81535 },
+        { entrance_code: "234A", latitude: 51.2208, longitude: 6.8154 },
+        { entrance_code: "234B", latitude: 51.22085, longitude: 6.81545 },
+        { entrance_code: "234C", latitude: 51.2209, longitude: 6.8155 },
+        { entrance_code: "234D", latitude: 51.22095, longitude: 6.81555 }
     ];
     
-    console.log('Adding static entrance markers');
+    console.log('Adding static entrance markers with precise coordinates');
     
     // Add CSS styles for the markers
     const style = document.createElement('style');
@@ -232,6 +232,7 @@ function addEntranceMarkers() {
         .entrance-marker {
             position: relative;
             cursor: pointer;
+            z-index: 1000;
         }
         .arrow-container {
             display: flex;
@@ -240,12 +241,12 @@ function addEntranceMarkers() {
             transform: translate(-50%, -50%);
         }
         .arrow-icon {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             background: #ff0000;
             border: 2px solid #ffffff;
             border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
             position: relative;
         }
         .arrow-icon::after {
@@ -256,18 +257,18 @@ function addEntranceMarkers() {
             transform: translate(-50%, -50%);
             width: 0;
             height: 0;
-            border-left: 4px solid transparent;
-            border-right: 4px solid transparent;
-            border-bottom: 8px solid #ffffff;
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+            border-bottom: 6px solid #ffffff;
         }
         .house-number {
             background: rgba(255, 255, 255, 0.95);
             color: #000;
             font-weight: bold;
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 3px;
-            margin-top: 2px;
+            font-size: 10px;
+            padding: 1px 4px;
+            border-radius: 2px;
+            margin-top: 1px;
             white-space: nowrap;
             box-shadow: 0 1px 3px rgba(0,0,0,0.3);
             border: 1px solid #ccc;
@@ -286,9 +287,13 @@ function addEntranceMarkers() {
             </div>
         `;
         
-        const marker = new mapboxgl.Marker({ element: markerElement })
-            .setLngLat([entrance.longitude, entrance.latitude])
-            .addTo(map);
+        // Create marker with precise positioning
+        const marker = new mapboxgl.Marker({ 
+            element: markerElement,
+            anchor: 'center'
+        })
+        .setLngLat([entrance.longitude, entrance.latitude])
+        .addTo(map);
         
         console.log(`Added entrance marker for ${entrance.entrance_code} at [${entrance.longitude}, ${entrance.latitude}]`);
     });
