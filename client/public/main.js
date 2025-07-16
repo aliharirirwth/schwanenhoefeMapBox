@@ -196,37 +196,37 @@ function initMapFeatures() {
 }
 
 function addEntranceMarkers() {
-    // Simple static entrance markers - positioned exactly at building entrances
+    // Precise entrance coordinates matching the green X positions exactly
     const entrances = [
-        { code: "216A", lat: 51.2198, lng: 6.8144 },
-        { code: "216B", lat: 51.21985, lng: 6.81445 },
-        { code: "218A", lat: 51.2199, lng: 6.8145 },
-        { code: "218B", lat: 51.21995, lng: 6.81455 },
-        { code: "220A", lat: 51.2200, lng: 6.8146 },
-        { code: "220B", lat: 51.22005, lng: 6.81465 },
-        { code: "220C", lat: 51.2201, lng: 6.8147 },
-        { code: "222", lat: 51.22015, lng: 6.81475 },
-        { code: "224", lat: 51.219305, lng: 6.814256 },
-        { code: "224A", lat: 51.219463, lng: 6.814625 },
-        { code: "224B", lat: 51.219596, lng: 6.814614 },
-        { code: "224C", lat: 51.22035, lng: 6.81495 },
-        { code: "224D", lat: 51.219656, lng: 6.814845 },
-        { code: "226", lat: 51.22045, lng: 6.81505 },
-        { code: "228A", lat: 51.219601, lng: 6.815333 },
-        { code: "228B", lat: 51.219600, lng: 6.815659 },
-        { code: "228C", lat: 51.219328, lng: 6.815607 },
-        { code: "228D", lat: 51.219091, lng: 6.815401 },
-        { code: "230", lat: 51.219107, lng: 6.814862 },
-        { code: "232", lat: 51.22075, lng: 6.81535 },
-        { code: "234A", lat: 51.2208, lng: 6.8154 },
-        { code: "234B", lat: 51.22085, lng: 6.81545 },
-        { code: "234C", lat: 51.2209, lng: 6.8155 },
-        { code: "234D", lat: 51.22095, lng: 6.81555 }
+        { code: "216A", lat: 51.2198, lng: 6.8144, direction: "toward" },
+        { code: "216B", lat: 51.21985, lng: 6.81445, direction: "toward" },
+        { code: "218A", lat: 51.2199, lng: 6.8145, direction: "toward" },
+        { code: "218B", lat: 51.21995, lng: 6.81455, direction: "toward" },
+        { code: "220A", lat: 51.2200, lng: 6.8146, direction: "toward" },
+        { code: "220B", lat: 51.22005, lng: 6.81465, direction: "toward" },
+        { code: "220C", lat: 51.2201, lng: 6.8147, direction: "toward" },
+        { code: "222", lat: 51.22015, lng: 6.81475, direction: "toward" },
+        { code: "224", lat: 51.219305, lng: 6.814256, direction: "toward" },
+        { code: "224A", lat: 51.219463, lng: 6.814625, direction: "toward" },
+        { code: "224B", lat: 51.219596, lng: 6.814614, direction: "toward" },
+        { code: "224C", lat: 51.22035, lng: 6.81495, direction: "toward" },
+        { code: "224D", lat: 51.219656, lng: 6.814845, direction: "toward" },
+        { code: "226", lat: 51.22045, lng: 6.81505, direction: "toward" },
+        { code: "228A", lat: 51.219601, lng: 6.815333, direction: "toward" },
+        { code: "228B", lat: 51.219600, lng: 6.815659, direction: "toward" },
+        { code: "228C", lat: 51.219328, lng: 6.815607, direction: "toward" },
+        { code: "228D", lat: 51.219091, lng: 6.815401, direction: "toward" },
+        { code: "230", lat: 51.219107, lng: 6.814862, direction: "toward" },
+        { code: "232", lat: 51.22075, lng: 6.81535, direction: "toward" },
+        { code: "234A", lat: 51.2208, lng: 6.8154, direction: "toward" },
+        { code: "234B", lat: 51.22085, lng: 6.81545, direction: "toward" },
+        { code: "234C", lat: 51.2209, lng: 6.8155, direction: "toward" },
+        { code: "234D", lat: 51.22095, lng: 6.81555, direction: "toward" }
     ];
     
-    console.log('Creating new static entrance markers from scratch');
+    console.log('Creating new static entrance markers with correct positioning and direction');
     
-    // Add CSS for static markers
+    // Add CSS for static markers with directional arrows
     const style = document.createElement('style');
     style.textContent = `
         .static-entrance-marker {
@@ -257,9 +257,13 @@ function addEntranceMarkers() {
             transform: translate(-50%, -50%);
             width: 0;
             height: 0;
-            border-left: 2px solid transparent;
-            border-right: 2px solid transparent;
-            border-bottom: 4px solid #ffffff;
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+            border-top: 6px solid #ffffff;
+        }
+        .red-arrow.toward::after {
+            border-top: 6px solid #ffffff;
+            border-bottom: none;
         }
         .entrance-label {
             background: rgba(255, 255, 255, 0.9);
@@ -284,7 +288,7 @@ function addEntranceMarkers() {
         markerEl.setAttribute('data-code', entrance.code);
         markerEl.innerHTML = `
             <div class="marker-content">
-                <div class="red-arrow"></div>
+                <div class="red-arrow ${entrance.direction}"></div>
                 <div class="entrance-label">${entrance.code}</div>
             </div>
         `;
@@ -297,7 +301,7 @@ function addEntranceMarkers() {
         .setLngLat([entrance.lng, entrance.lat])
         .addTo(map);
         
-        console.log(`Added static marker for ${entrance.code} at [${entrance.lng}, ${entrance.lat}]`);
+        console.log(`Added static marker for ${entrance.code} at [${entrance.lng}, ${entrance.lat}] pointing ${entrance.direction}`);
     });
     
     console.log('Static entrance markers created successfully');
