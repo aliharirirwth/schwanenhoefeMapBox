@@ -202,11 +202,11 @@ function addEntranceMarkers() {
         
         console.log('Adding entrance markers from scratch');
         
-        // Create dynamic red arrow markers for each entrance
+        // Create static red arrow markers for each entrance
         entrances
             .filter(e => e.showTriangle)
             .forEach(entrance => {
-                // Create a dynamic red arrow marker with house number
+                // Create a static red arrow marker with house number
                 const markerElement = document.createElement('div');
                 markerElement.className = 'entrance-marker';
                 markerElement.innerHTML = `
@@ -234,7 +234,6 @@ function addEntranceMarkers() {
                     }
                     .arrow-icon {
                         filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-                        animation: pulse 2s infinite;
                     }
                     .house-number {
                         background: rgba(255, 255, 255, 0.9);
@@ -247,11 +246,6 @@ function addEntranceMarkers() {
                         white-space: nowrap;
                         box-shadow: 0 1px 3px rgba(0,0,0,0.3);
                         border: 1px solid #ccc;
-                    }
-                    @keyframes pulse {
-                        0% { transform: scale(1); }
-                        50% { transform: scale(1.1); }
-                        100% { transform: scale(1); }
                     }
                 `;
                 document.head.appendChild(style);
