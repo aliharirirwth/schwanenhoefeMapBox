@@ -25,23 +25,23 @@ export class NavigationManager {
         if (window.DeviceOrientationEvent) {
             // Request permission for device orientation (iOS 13+)
             if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                const requestPermission = async () => {
-                    try {
-                        const permission = await DeviceOrientationEvent.requestPermission();
-                        if (permission === 'granted') {
-                            this.setupDeviceOrientationListener();
-                        }
-                    } catch (error) {
-                        console.log('Device orientation permission denied or not available');
-                    }
-                };
-                
-                // Add a button or trigger to request permission
-                this.addOrientationPermissionButton();
+                // Automatically request permission when navigation starts
+                this.requestOrientationPermission();
             } else {
                 // For devices that don't require permission
                 this.setupDeviceOrientationListener();
             }
+        }
+    }
+
+    async requestOrientationPermission() {
+        try {
+            const permission = await DeviceOrientationEvent.requestPermission();
+            if (permission === 'granted') {
+                this.setupDeviceOrientationListener();
+            }
+        } catch (error) {
+            console.log('Device orientation permission denied or not available');
         }
     }
 
@@ -56,39 +56,7 @@ export class NavigationManager {
         });
     }
 
-    addOrientationPermissionButton() {
-        // Add a small button to request orientation permission
-        const button = document.createElement('button');
-        button.textContent = 'Enable Direction';
-        button.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #4285f4;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 8px 16px;
-            font-size: 12px;
-            z-index: 1000;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        `;
-        
-        button.onclick = async () => {
-            try {
-                const permission = await DeviceOrientationEvent.requestPermission();
-                if (permission === 'granted') {
-                    this.setupDeviceOrientationListener();
-                    button.remove();
-                }
-            } catch (error) {
-                console.log('Device orientation permission denied');
-            }
-        };
-        
-        document.body.appendChild(button);
-    }
+    // Removed the orientation permission button - now automatically requests permission
 
     createDistanceDisplay() {
         // Create distance display element
@@ -113,6 +81,19 @@ export class NavigationManager {
     }
 
     setUserLocation(location, heading = null) {
+        // Only update if location has actually changed significantly
+        if (userCurrentLocation) {
+            const distance = Math.sqrt(
+                Math.pow(userCurrentLocation[0] - location[0], 2) + 
+                Math.pow(userCurrentLocation[1] - location[1], 2)
+            );
+            
+            // Only update if movement is significant (more than 1 meter)
+            if (distance < 0.00001) { // Approximately 1 meter
+                return;
+            }
+        }
+        
         userCurrentLocation = location;
         this.updateUserMarker();
         
@@ -180,7 +161,7 @@ export class NavigationManager {
             .setLngLat(userCurrentLocation)
             .addTo(this.map);
         } else {
-            // Only update position if it has changed significantly (to prevent micro-movements)
+            // Improved position update logic to prevent jumping
             const currentPos = userMarker.getLngLat();
             const newPos = userCurrentLocation;
             
@@ -190,8 +171,9 @@ export class NavigationManager {
                 Math.pow(currentPos.lat - newPos[1], 2)
             );
             
-            // Only update if the change is significant (more than 0.5 meters)
-            if (distance > 0.000005) { // Approximately 0.5 meters
+            // Only update if the change is significant (more than 2 meters)
+            // Increased threshold to prevent micro-movements during zoom
+            if (distance > 0.00002) { // Approximately 2 meters
                 userMarker.setLngLat(userCurrentLocation);
             }
         }
@@ -258,6 +240,11 @@ export class NavigationManager {
         
         // Enter fullscreen navigation mode
         this.enterFullscreenMode();
+        
+        // Request device orientation permission for direction detection
+        if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            this.requestOrientationPermission();
+        }
         
         console.log('Navigation started successfully');
         return true;

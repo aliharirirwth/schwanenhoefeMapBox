@@ -517,8 +517,8 @@ function initGeolocation() {
       },
       {
         enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 1000,
+        maximumAge: 3000, // Allow cached positions up to 3 seconds old
+        timeout: 5000,
         heading: true,
       }
     );
