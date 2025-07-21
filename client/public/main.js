@@ -465,7 +465,7 @@ function addEntranceMarkers() {
         type: "Feature",
         geometry: {
           type: "Point",
-          coordinates: [6.815500, 51.219300], // Parking garage coordinates (highlighted building)
+          coordinates: [6.815200, 51.219400], // Parking garage coordinates (center-right building with blue marker)
         },
         properties: {
           icon: "P",

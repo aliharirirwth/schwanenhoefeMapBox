@@ -41,7 +41,7 @@ export const companies = [
   { name: "Zeron GmbH", address: "Erkrather Straße 234 a", building_code: "234A", entrance_code: "234A", logo: "image_logos/zeron.png", latitude: 51.2228, longitude: 6.8114 },
   { name: "4stairs", address: "Erkrather Straße 230", building_code: "230", entrance_code: "230", logo: "image_logos/4stairs-4-768x384.png", latitude: 51.219107, longitude: 6.814862 },
   { name: "ifenius", address: "Erkrather Straße 228 a", building_code: "228A", entrance_code: "228A", logo: "image_logos/ifenius.png", latitude: 51.219601, longitude: 6.815333 },
-  { name: "Parking Garage", address: "Erkrather Straße", building_code: "PARKING", entrance_code: "PARKING", logo: null, latitude: 51.219300, longitude: 6.815500, isParking: true }
+  { name: "Parking Garage", address: "Erkrather Straße", building_code: "PARKING", entrance_code: "PARKING", logo: null, latitude: 51.219400, longitude: 6.815200, isParking: true }
 ];
 
 // Unique building numbers for grid/list
