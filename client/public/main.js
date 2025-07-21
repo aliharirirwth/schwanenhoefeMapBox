@@ -429,6 +429,7 @@ function addEntranceMarkers() {
       "circle-stroke-width": 2,
       "circle-opacity": 0, // Initially hidden
     },
+    filter: ["==", ["get", "code"], ""], // Filter to show nothing initially
   });
 
   // Add symbol layer for the entrance labels (initially hidden)
@@ -452,6 +453,7 @@ function addEntranceMarkers() {
       "text-halo-blur": 0,
       "text-opacity": 0, // Initially hidden
     },
+    filter: ["==", ["get", "code"], ""], // Filter to show nothing initially
   });
 
   // Add parking garage marker with 'P' icon
@@ -531,7 +533,11 @@ const companyEntranceMapping = {
 function showEntranceMarkers(buildingCode) {
   console.log("Showing entrance markers for building:", buildingCode);
   
-  // Show all entrance markers
+  // Filter to show only markers for the selected building
+  map.setFilter("entrance-circles", ["==", ["get", "code"], buildingCode]);
+  map.setFilter("entrance-labels", ["==", ["get", "code"], buildingCode]);
+  
+  // Show the filtered markers
   map.setPaintProperty("entrance-circles", "circle-opacity", 1);
   map.setPaintProperty("entrance-labels", "text-opacity", 1);
 }
@@ -543,12 +549,24 @@ function hideEntranceMarkers() {
   // Hide all entrance markers
   map.setPaintProperty("entrance-circles", "circle-opacity", 0);
   map.setPaintProperty("entrance-labels", "text-opacity", 0);
+  
+  // Clear filters to ensure all markers are hidden
+  map.setFilter("entrance-circles", null);
+  map.setFilter("entrance-labels", null);
 }
 
 // Make functions and data globally accessible
 window.showEntranceMarkers = showEntranceMarkers;
 window.hideEntranceMarkers = hideEntranceMarkers;
 window.companyEntranceMapping = companyEntranceMapping;
+
+// Initialize entrance markers as completely hidden
+window.addEventListener('load', () => {
+  // Ensure entrance markers are hidden on page load
+  if (window.hideEntranceMarkers) {
+    window.hideEntranceMarkers();
+  }
+});
 
 function initGeolocation() {
   if ("geolocation" in navigator) {

@@ -90,6 +90,7 @@ export class UIManager {
                 if (window.showEntranceMarkers) {
                     // Use the entrance code from the mapping if available, otherwise use building_code
                     const entranceCode = window.companyEntranceMapping ? window.companyEntranceMapping[c.name] : c.building_code;
+                    console.log(`Showing entrance markers for company: ${c.name}, building: ${c.building_code}, entrance: ${entranceCode}`);
                     window.showEntranceMarkers(entranceCode || c.building_code);
                 }
                 
@@ -141,6 +142,7 @@ export class UIManager {
                 
                 // Show entrance markers for this building
                 if (window.showEntranceMarkers) {
+                    console.log(`Showing entrance markers for building: ${num}`);
                     window.showEntranceMarkers(num);
                 }
                 
