@@ -17,6 +17,77 @@ export class NavigationManager {
         this.mapboxgl = mapboxgl;
         this.accessToken = mapboxgl.accessToken;
         this.createDistanceDisplay();
+        this.initDeviceOrientation();
+    }
+
+    initDeviceOrientation() {
+        // Listen for device orientation changes (for mobile devices)
+        if (window.DeviceOrientationEvent) {
+            // Request permission for device orientation (iOS 13+)
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                const requestPermission = async () => {
+                    try {
+                        const permission = await DeviceOrientationEvent.requestPermission();
+                        if (permission === 'granted') {
+                            this.setupDeviceOrientationListener();
+                        }
+                    } catch (error) {
+                        console.log('Device orientation permission denied or not available');
+                    }
+                };
+                
+                // Add a button or trigger to request permission
+                this.addOrientationPermissionButton();
+            } else {
+                // For devices that don't require permission
+                this.setupDeviceOrientationListener();
+            }
+        }
+    }
+
+    setupDeviceOrientationListener() {
+        window.addEventListener('deviceorientation', (event) => {
+            if (event.alpha !== null) {
+                // alpha is the rotation around the z-axis (0-360 degrees)
+                // Convert to match mapbox coordinate system
+                const heading = 360 - event.alpha;
+                this.updateUserDirection(heading);
+            }
+        });
+    }
+
+    addOrientationPermissionButton() {
+        // Add a small button to request orientation permission
+        const button = document.createElement('button');
+        button.textContent = 'Enable Direction';
+        button.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 12px;
+            z-index: 1000;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        `;
+        
+        button.onclick = async () => {
+            try {
+                const permission = await DeviceOrientationEvent.requestPermission();
+                if (permission === 'granted') {
+                    this.setupDeviceOrientationListener();
+                    button.remove();
+                }
+            } catch (error) {
+                console.log('Device orientation permission denied');
+            }
+        };
+        
+        document.body.appendChild(button);
     }
 
     createDistanceDisplay() {
@@ -41,9 +112,26 @@ export class NavigationManager {
         document.body.appendChild(distanceDisplay);
     }
 
-    setUserLocation(location) {
+    setUserLocation(location, heading = null) {
         userCurrentLocation = location;
         this.updateUserMarker();
+        
+        // Update direction if heading is provided
+        if (heading !== null && heading !== undefined) {
+            this.updateUserDirection(heading);
+        }
+    }
+
+    updateUserDirection(heading) {
+        if (!userMarker) return;
+        
+        const directionIndicator = document.getElementById('user-direction-indicator');
+        if (directionIndicator) {
+            // Rotate the direction indicator based on heading
+            // Mapbox uses 0° as North, so we need to adjust accordingly
+            const rotation = heading || 0;
+            directionIndicator.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+        }
     }
 
     setDestination(destination) {
@@ -52,38 +140,60 @@ export class NavigationManager {
     }
 
     updateUserMarker() {
-        if (userMarker) userMarker.remove();
-        if (userCurrentLocation) {
-            // Create a more prominent user marker with direction indicator
+        if (!userCurrentLocation) return;
+        
+        // Create user marker only once if it doesn't exist
+        if (!userMarker) {
             const el = document.createElement('div');
             el.style.cssText = `
-                width: 20px;
-                height: 20px;
+                width: 24px;
+                height: 24px;
                 background: #4285f4;
                 border: 3px solid white;
                 border-radius: 50%;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
                 position: relative;
+                transition: transform 0.3s ease;
             `;
             
-            // Add direction indicator
+            // Add direction indicator (arrow)
             const directionIndicator = document.createElement('div');
+            directionIndicator.id = 'user-direction-indicator';
             directionIndicator.style.cssText = `
                 position: absolute;
-                top: -8px;
+                top: -10px;
                 left: 50%;
-                transform: translateX(-50%);
+                transform: translateX(-50%) rotate(0deg);
                 width: 0;
                 height: 0;
-                border-left: 6px solid transparent;
-                border-right: 6px solid transparent;
-                border-bottom: 12px solid #4285f4;
+                border-left: 8px solid transparent;
+                border-right: 8px solid transparent;
+                border-bottom: 16px solid #4285f4;
+                transition: transform 0.3s ease;
             `;
             el.appendChild(directionIndicator);
             
-            userMarker = new this.mapboxgl.Marker({ element: el })
-                .setLngLat(userCurrentLocation)
-                .addTo(this.map);
+            userMarker = new this.mapboxgl.Marker({ 
+                element: el,
+                anchor: 'center'
+            })
+            .setLngLat(userCurrentLocation)
+            .addTo(this.map);
+        } else {
+            // Only update position if it has changed significantly (to prevent micro-movements)
+            const currentPos = userMarker.getLngLat();
+            const newPos = userCurrentLocation;
+            
+            // Calculate distance between current and new position
+            const distance = Math.sqrt(
+                Math.pow(currentPos.lng - newPos[0], 2) + 
+                Math.pow(currentPos.lat - newPos[1], 2)
+            );
+            
+            // Only update if the change is significant (more than 0.5 meters)
+            if (distance > 0.000005) { // Approximately 0.5 meters
+                userMarker.setLngLat(userCurrentLocation);
+            }
         }
     }
 
@@ -146,6 +256,9 @@ export class NavigationManager {
         console.log('Calling attachEndNavigationToMarker...');
         this.attachEndNavigationToMarker();
         
+        // Enter fullscreen navigation mode
+        this.enterFullscreenMode();
+        
         console.log('Navigation started successfully');
         return true;
     }
@@ -155,6 +268,7 @@ export class NavigationManager {
         this.detachEndNavigationFromMarker();
         this.clearRoute();
         this.hideDistanceDisplay();
+        this.exitFullscreenMode();
         selectedDestination = null;
         currentRoute = null;
         traveledPath = [];
@@ -162,19 +276,102 @@ export class NavigationManager {
         console.log('Navigation stopped');
     }
 
+    clearUserMarker() {
+        if (userMarker) {
+            userMarker.remove();
+            userMarker = null;
+        }
+    }
+
+    enterFullscreenMode() {
+        const appRoot = document.getElementById('app-root');
+        if (appRoot) {
+            appRoot.classList.add('navigation-fullscreen');
+            this.createFullscreenControls();
+        }
+    }
+
+    exitFullscreenMode() {
+        const appRoot = document.getElementById('app-root');
+        if (appRoot) {
+            appRoot.classList.remove('navigation-fullscreen');
+            this.removeFullscreenControls();
+        }
+    }
+
+    createFullscreenControls() {
+        // Create exit fullscreen button
+        const exitBtn = document.createElement('button');
+        exitBtn.className = 'exit-fullscreen-btn';
+        exitBtn.innerHTML = '✕';
+        exitBtn.onclick = () => {
+            this.stopNavigation();
+        };
+        document.body.appendChild(exitBtn);
+
+        // Create fullscreen navigation controls
+        const controls = document.createElement('div');
+        controls.className = 'navigation-controls';
+        controls.innerHTML = `
+            <button class="control-button stop" onclick="window.navigationManager.stopNavigation()">
+                Stop Navigation
+            </button>
+        `;
+        document.body.appendChild(controls);
+    }
+
+    removeFullscreenControls() {
+        const exitBtn = document.querySelector('.exit-fullscreen-btn');
+        const controls = document.querySelector('.navigation-controls');
+        
+        if (exitBtn) exitBtn.remove();
+        if (controls) controls.remove();
+    }
+
+    showArrivalNotification() {
+        // Trigger device vibration if available
+        if (navigator.vibrate) {
+            navigator.vibrate([200, 100, 200, 100, 200]);
+        }
+
+        const notification = document.createElement('div');
+        notification.className = 'arrival-notification';
+        notification.innerHTML = `
+            <span class="arrival-icon">🎉</span>
+            <div class="arrival-text">You have arrived at your destination!</div>
+            <button class="arrival-button" onclick="this.parentElement.remove(); window.navigationManager.exitFullscreenMode();">
+                OK
+            </button>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Auto-remove after 8 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 8000);
+    }
+
+    showArrivalModal() {
+        // Backward compatibility - redirect to new notification
+        this.showArrivalNotification();
+    }
+
     clearRoute() {
         // Remove route layers
         if (this.map.getLayer('route')) {
             this.map.removeLayer('route');
         }
-        if (this.map.getLayer('traveled-route')) {
-            this.map.removeLayer('traveled-route');
+        if (this.map.getLayer('completed-route')) {
+            this.map.removeLayer('completed-route');
         }
         if (this.map.getSource('route')) {
             this.map.removeSource('route');
         }
-        if (this.map.getSource('traveled-route')) {
-            this.map.removeSource('traveled-route');
+        if (this.map.getSource('completed-route')) {
+            this.map.removeSource('completed-route');
         }
         
         // Remove destination marker
@@ -182,6 +379,10 @@ export class NavigationManager {
             destinationMarker.remove();
             destinationMarker = null;
         }
+        
+        // Reset progress tracking
+        this.fullRouteCoordinates = null;
+        this.progressIndex = 0;
     }
 
     drawRoute() {
@@ -273,7 +474,11 @@ export class NavigationManager {
     }
 
     addRouteToMap(data) {
-        // Add the full route (remaining path)
+        // Store the full route coordinates for progress tracking
+        this.fullRouteCoordinates = data.coordinates;
+        this.progressIndex = 0; // Track how much of the route has been completed
+        
+        // Add the full route (starts dark blue)
         if (!this.map.getSource('route')) {
             this.map.addSource('route', { 
                 type: 'geojson', 
@@ -291,30 +496,30 @@ export class NavigationManager {
                 layout: { 'line-join': 'round', 'line-cap': 'round' },
                 paint: {
                     'line-width': 8,
-                    'line-color': '#90caf9', // Light blue for remaining path
-                    'line-opacity': 0.8
+                    'line-color': '#1565c0', // Darker blue for remaining route
+                    'line-opacity': 0.95
                 }
             });
         }
         
-        // Add traveled route layer
-        if (!this.map.getSource('traveled-route')) {
-            this.map.addSource('traveled-route', { 
+        // Add completed route layer (will be light blue)
+        if (!this.map.getSource('completed-route')) {
+            this.map.addSource('completed-route', { 
                 type: 'geojson', 
                 data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [] } } 
             });
         }
         
-        if (!this.map.getLayer('traveled-route')) {
+        if (!this.map.getLayer('completed-route')) {
             this.map.addLayer({
-                id: 'traveled-route',
+                id: 'completed-route',
                 type: 'line',
-                source: 'traveled-route',
+                source: 'completed-route',
                 layout: { 'line-join': 'round', 'line-cap': 'round' },
                 paint: {
                     'line-width': 8,
-                    'line-color': '#0d47a1', // Dark blue for traveled path
-                    'line-opacity': 1
+                    'line-color': '#64b5f6', // Brighter light blue for completed portions
+                    'line-opacity': 0.9
                 }
             });
         }
@@ -362,20 +567,6 @@ export class NavigationManager {
         userCurrentLocation = newLocation;
         this.updateUserMarker();
         
-        // Add new location to traveled path
-        traveledPath.push(newLocation);
-        
-        // Update traveled route display
-        if (this.map.getSource('traveled-route')) {
-            this.map.getSource('traveled-route').setData({
-                type: 'Feature',
-                geometry: {
-                    type: 'LineString',
-                    coordinates: traveledPath
-                }
-            });
-        }
-        
         // Find progress along the route
         const coordinates = currentRoute.geometry.coordinates;
         let closestIdx = 0;
@@ -389,6 +580,11 @@ export class NavigationManager {
             }
         }
         
+        // Update progress index (only if significant change to prevent micro-updates)
+        if (Math.abs(this.progressIndex - closestIdx) >= 1) {
+            this.progressIndex = closestIdx;
+        }
+        
         // Calculate remaining distance
         const remainingDistance = this.calculateRemainingDistance(closestIdx);
         this.updateDistanceDisplay(remainingDistance);
@@ -397,11 +593,36 @@ export class NavigationManager {
         const destDist = calculateDistance(userCurrentLocation, selectedDestination);
         if (destDist < 10) {
             this.stopNavigation();
-            this.showArrivalModal();
+            this.showArrivalNotification();
             return;
         }
         
-        // Update the remaining route (remove traveled portion)
+        // Update the completed route (light blue)
+        if (closestIdx > 0) {
+            const completedCoordinates = coordinates.slice(0, closestIdx + 1);
+            if (this.map.getSource('completed-route')) {
+                this.map.getSource('completed-route').setData({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: completedCoordinates
+                    }
+                });
+            }
+        } else {
+            // Clear completed route if at start
+            if (this.map.getSource('completed-route')) {
+                this.map.getSource('completed-route').setData({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: []
+                    }
+                });
+            }
+        }
+        
+        // Update the remaining route (dark blue)
         if (closestIdx < coordinates.length - 1) {
             const remainingCoordinates = coordinates.slice(closestIdx);
             if (this.map.getSource('route')) {

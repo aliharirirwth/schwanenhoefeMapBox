@@ -84,6 +84,9 @@ function initAppLogic() {
   // Initialize managers
   navigationManager = new NavigationManager(map, mapboxgl);
   uiManager = new UIManager(navigationManager);
+  
+  // Make navigation manager globally accessible
+  window.navigationManager = navigationManager;
 
   console.log("Navigation manager initialized:", navigationManager);
   console.log("UI manager initialized:", uiManager);
@@ -457,8 +460,10 @@ function initGeolocation() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const loc = [position.coords.longitude, position.coords.latitude];
+        const heading = position.coords.heading;
         console.log("Initial location received:", loc);
         console.log("Accuracy:", position.coords.accuracy, "meters");
+        console.log("Heading:", heading, "degrees");
 
         // Update map center to user location
         map.flyTo({
@@ -467,7 +472,7 @@ function initGeolocation() {
           duration: 2000,
         });
 
-        navigationManager.setUserLocation(loc);
+        navigationManager.setUserLocation(loc, heading);
       },
       (error) => {
         console.error("Error getting initial location:", error);
@@ -479,6 +484,7 @@ function initGeolocation() {
         enableHighAccuracy: true,
         maximumAge: 0,
         timeout: 10000,
+        heading: true,
       }
     );
 
@@ -486,10 +492,12 @@ function initGeolocation() {
     navigator.geolocation.watchPosition(
       (position) => {
         const loc = [position.coords.longitude, position.coords.latitude];
+        const heading = position.coords.heading;
         console.log("Location update received:", loc);
         console.log("Accuracy:", position.coords.accuracy, "meters");
+        console.log("Heading:", heading, "degrees");
 
-        navigationManager.setUserLocation(loc);
+        navigationManager.setUserLocation(loc, heading);
         navigationManager.updateRouteProgress(loc);
 
         // Only zoom to location when navigation is active
@@ -497,7 +505,7 @@ function initGeolocation() {
           map.flyTo({
             center: loc,
             zoom: 18,
-            bearing: position.coords.heading || 0,
+            bearing: heading || 0,
             pitch: 60,
             duration: 1000,
           });
@@ -511,6 +519,7 @@ function initGeolocation() {
         enableHighAccuracy: true,
         maximumAge: 0,
         timeout: 1000,
+        heading: true,
       }
     );
   } else {

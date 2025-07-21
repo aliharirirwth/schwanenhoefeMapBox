@@ -1016,4 +1016,188 @@ body {
 #end-navigation-modal.show,
 #arrival-modal.show {
     display: block !important;
+}
+
+/* Fullscreen Navigation Mode */
+.navigation-fullscreen {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 2000 !important;
+    background: #000 !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.navigation-fullscreen #map {
+    width: 100vw !important;
+    height: calc(100vh - 80px) !important;
+    min-height: none !important;
+    max-height: none !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.navigation-fullscreen #right-panel {
+    display: none !important;
+}
+
+.navigation-fullscreen .logo-header {
+    display: none !important;
+}
+
+.navigation-fullscreen .main-wrapper {
+    height: 100vh !important;
+    width: 100vw !important;
+}
+
+.navigation-fullscreen .navigation-controls {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
+    padding: 1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0)) 1rem !important;
+    z-index: 2001 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.navigation-fullscreen .control-button {
+    flex: 1 !important;
+    margin: 0 0.5rem !important;
+    padding: 1rem 0.5rem !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    border-radius: 0.8rem !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.navigation-fullscreen .control-button.stop {
+    background: linear-gradient(135deg, #F44336, #E53935) !important;
+    color: white !important;
+}
+
+.navigation-fullscreen .control-button:not(.stop) {
+    background: linear-gradient(135deg, #2196F3, #1976D2) !important;
+    color: white !important;
+}
+
+.navigation-fullscreen .control-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+.navigation-fullscreen .control-button:active {
+    transform: translateY(0) !important;
+}
+
+.navigation-fullscreen #distance-display {
+    top: 10px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+    color: white !important;
+    padding: 12px 20px !important;
+    border-radius: 25px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    z-index: 2002 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Arrival Notification */
+.arrival-notification {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: linear-gradient(135deg, #4CAF50, #45a049) !important;
+    color: white !important;
+    padding: 2rem 3rem !important;
+    border-radius: 1rem !important;
+    font-size: 1.3rem !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    z-index: 3000 !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    animation: arrivalPulse 2s ease-in-out !important;
+}
+
+@keyframes arrivalPulse {
+    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.arrival-notification .arrival-icon {
+    font-size: 3rem !important;
+    margin-bottom: 1rem !important;
+    display: block !important;
+}
+
+.arrival-notification .arrival-text {
+    margin-bottom: 1rem !important;
+}
+
+.arrival-notification .arrival-button {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    padding: 0.8rem 1.5rem !important;
+    border-radius: 0.5rem !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.arrival-notification .arrival-button:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Exit Fullscreen Button */
+.exit-fullscreen-btn {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    background: rgba(0, 0, 0, 0.7) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 50% !important;
+    width: 50px !important;
+    height: 50px !important;
+    font-size: 1.5rem !important;
+    cursor: pointer !important;
+    z-index: 2003 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    backdrop-filter: blur(10px) !important;
+    transition: all 0.2s ease !important;
+}
+
+.exit-fullscreen-btn:hover {
+    background: rgba(0, 0, 0, 0.8) !important;
+    transform: scale(1.1) !important;
+}
+
+/* Hide regular UI elements in fullscreen mode */
+.navigation-fullscreen .sticky-header,
+.navigation-fullscreen .panel-toggle,
+.navigation-fullscreen #controls-bar {
+    display: none !important;
 } 
