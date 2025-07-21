@@ -17,6 +17,8 @@ A modern navigation application built with Mapbox GL JS that provides 3D buildin
 - **Building number navigation** - Select destinations by building number
 - **Search functionality** - Filter companies and buildings by name
 - **Visual markers** - Triangle icons and building labels on the map
+- **Entrance markers** - Red circles show building entrances after selection
+- **Parking garage** - 'P' icon marks the parking garage location
 
 ### 🎨 Modern UI
 - **Responsive design** - Works on desktop and mobile devices
@@ -25,6 +27,13 @@ A modern navigation application built with Mapbox GL JS that provides 3D buildin
 - **Modal dialogs** - Clean confirmation and information dialogs
 
 ## Technical Improvements
+
+### Entrance Marker System
+1. **Selective visibility** - Entrance markers only appear after user selection
+2. **House number 214** - Added Kiosk building to the system
+3. **Parking garage** - Added parking garage with 'P' icon
+4. **Excel data integration** - Connected entrances to house numbers using Excel data
+5. **Position preservation** - All existing entrance marker positions maintained
 
 ### Navigation Enhancements
 1. **Removed fallback location** - Only uses actual GPS location
