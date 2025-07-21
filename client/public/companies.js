@@ -24,6 +24,7 @@ export const companies = [
   { name: "IST Studieninstitut GmbH", address: "Erkrather Straße 220 a-c", building_code: "220A,220B,220C", entrance_code: "220A", logo: null, latitude: 51.2212, longitude: 6.8130 },
   { name: "JP KOM GmbH", address: "Erkrather Straße 234 b", building_code: "234B", entrance_code: "234B", logo: "image_logos/JPKOM_Logo_CMYK-768x422.jpg", latitude: 51.2213, longitude: 6.8129 },
   { name: "JustSpices GmbH", address: "Erkrather Straße 228 a", building_code: "228A", entrance_code: "228A", logo: null, latitude: 51.219601, longitude: 6.815333 },
+  { name: "Kiosk", address: "Erkrather Straße 214", building_code: "214", entrance_code: "214", logo: null, latitude: 51.219021, longitude: 6.814106 },
   { name: "NanoGiants GmbH", address: "Erkrather Straße 230", building_code: "230", entrance_code: "230", logo: "image_logos/nanogiants_logo_20201022-1024x146-1-768x110.jpg", latitude: 51.219107, longitude: 6.814862 },
   { name: "OnlineDialog GmbH", address: "Erkrather Straße 216a", building_code: "216A", entrance_code: "216A", logo: "image_logos/schwanenhoefe_mieter_onlinedialog.jpg", latitude: 51.2216, longitude: 6.8126 },
   { name: "Parkett Strehl GmbH", address: "Erkrather Straße 228 a", building_code: "228A", entrance_code: "228A", logo: "image_logos/schwanenhoefe_mieter_parkett_strehl.jpg", latitude: 51.219601, longitude: 6.815333 },
@@ -39,12 +40,13 @@ export const companies = [
   { name: "WHU Wissenschaftliche Hochschule für Unternehmensführung", address: "Erkrather Straße 224 a, 218, 228 a-c, 230", building_code: "224A,218,228A,228B,228C,230", entrance_code: "224A", logo: "image_logos/whu.jpg", latitude: 51.219107, longitude: 6.814862 },
   { name: "Zeron GmbH", address: "Erkrather Straße 234 a", building_code: "234A", entrance_code: "234A", logo: "image_logos/zeron.png", latitude: 51.2228, longitude: 6.8114 },
   { name: "4stairs", address: "Erkrather Straße 230", building_code: "230", entrance_code: "230", logo: "image_logos/4stairs-4-768x384.png", latitude: 51.219107, longitude: 6.814862 },
-  { name: "ifenius", address: "Erkrather Straße 228 a", building_code: "228A", entrance_code: "228A", logo: "image_logos/ifenius.png", latitude: 51.219601, longitude: 6.815333 }
+  { name: "ifenius", address: "Erkrather Straße 228 a", building_code: "228A", entrance_code: "228A", logo: "image_logos/ifenius.png", latitude: 51.219601, longitude: 6.815333 },
+  { name: "Parking Garage", address: "Erkrather Straße", building_code: "PARKING", entrance_code: "PARKING", logo: null, latitude: 51.219300, longitude: 6.815500, isParking: true }
 ];
 
 // Unique building numbers for grid/list
 export const buildingNumbers = [
-  "216A", "216B", "218A", "218B", "220A", "220B", "220C", "222", "224", "224A", "224B", "224C", "224D", "226", "228A", "228B", "228C", "228D", "230", "232", "234A", "234B", "234C", "234D"
+  "214", "216A", "216B", "218A", "218B", "220A", "220B", "220C", "222", "224", "224A", "224B", "224C", "224D", "226", "228A", "228B", "228C", "228D", "230", "232", "234A", "234B", "234C", "234D", "PARKING"
 ];
 
 // Entrances (red triangles) based on the map - using real coordinates

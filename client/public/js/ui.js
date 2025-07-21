@@ -37,6 +37,14 @@ export class UIManager {
                 clearSearch.style.display = 'none';
                 this.renderMostVisited(companies);
                 this.renderBuildingGrid(buildingNumbers);
+                
+                // Hide entrance markers when search is cleared
+                if (window.hideEntranceMarkers) {
+                    window.hideEntranceMarkers();
+                }
+                
+                // Remove selected state from all buttons
+                document.querySelectorAll('.company-btn, .company-grid-btn').forEach(b => b.classList.remove('selected'));
             };
         }
     }
@@ -77,6 +85,14 @@ export class UIManager {
                 document.querySelectorAll('.company-btn').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
                 let coords = [c.longitude, c.latitude];
+                
+                // Show entrance markers for this company's building
+                if (window.showEntranceMarkers) {
+                    // Use the entrance code from the mapping if available, otherwise use building_code
+                    const entranceCode = window.companyEntranceMapping ? window.companyEntranceMapping[c.name] : c.building_code;
+                    window.showEntranceMarkers(entranceCode || c.building_code);
+                }
+                
                 this.handleDestinationSelection(coords);
             };
             container.appendChild(btn);
@@ -122,6 +138,12 @@ export class UIManager {
                 // Use the first company's coordinates for this building
                 const company = buildingCompanies[0];
                 let coords = company ? [company.longitude, company.latitude] : [6.8143, 51.2187];
+                
+                // Show entrance markers for this building
+                if (window.showEntranceMarkers) {
+                    window.showEntranceMarkers(num);
+                }
+                
                 this.handleDestinationSelection(coords);
             };
             grid.appendChild(btn);

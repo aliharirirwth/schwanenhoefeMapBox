@@ -109,9 +109,13 @@ function initAppLogic() {
 
   console.log("App initialization completed");
 
-  // Add global test function
+  // Add global test functions
   window.testLocation = () => {
-    this.navigationManager.testLocation();
+    navigationManager.testLocation();
+  };
+  
+  window.testUserMarker = () => {
+    navigationManager.testUserMarker();
   };
 
   // Add global navigation test function
@@ -413,7 +417,7 @@ function addEntranceMarkers() {
     data: geojsonData,
   });
 
-  // Add circle layer for the red dots
+  // Add circle layer for the red dots (initially hidden)
   map.addLayer({
     id: "entrance-circles",
     type: "circle",
@@ -423,11 +427,11 @@ function addEntranceMarkers() {
       "circle-radius": 8,
       "circle-stroke-color": "#ffffff",
       "circle-stroke-width": 2,
-      "circle-opacity": 1,
+      "circle-opacity": 0, // Initially hidden
     },
   });
 
-  // Add symbol layer for the entrance labels
+  // Add symbol layer for the entrance labels (initially hidden)
   map.addLayer({
     id: "entrance-labels",
     type: "symbol",
@@ -446,11 +450,105 @@ function addEntranceMarkers() {
       "text-halo-color": "#ffffff",
       "text-halo-width": 2,
       "text-halo-blur": 0,
+      "text-opacity": 0, // Initially hidden
+    },
+  });
+
+  // Add parking garage marker with 'P' icon
+  map.addSource("parking-marker", {
+    type: "geojson",
+    data: {
+      type: "FeatureCollection",
+      features: [{
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [6.815500, 51.219300], // Parking garage coordinates (highlighted building)
+        },
+        properties: {
+          icon: "P",
+        },
+      }],
+    },
+  });
+
+  map.addLayer({
+    id: "parking-symbol",
+    type: "symbol",
+    source: "parking-marker",
+    layout: {
+      "text-field": ["get", "icon"],
+      "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+      "text-size": 16,
+      "text-offset": [0, 0],
+      "text-anchor": "center",
+      "text-allow-overlap": true,
+      "text-ignore-placement": true,
+    },
+    paint: {
+      "text-color": "#000000",
+      "text-halo-color": "#ffffff",
+      "text-halo-width": 2,
+      "text-halo-blur": 0,
     },
   });
 
   console.log("Entrance markers created successfully using GeoJSON");
 }
+
+// Mapping of companies to their entrance codes based on Excel data
+const companyEntranceMapping = {
+  "alessandro International GmbH": "228D",
+  "alessandro International GmbH Shop": "224D", 
+  "Alfons & Alfreda Managment GmbH": "230",
+  "babiel GmbH": "224A",
+  "Camp Physiotherapie": "224B",
+  "FitX Deutschland GmbH": "230",
+  "Frango Portugûes GbR": "224",
+  "GFG Life GmbH": "224A",
+  "H.J. Heinz GmbH": "228B",
+  "Iberian Living home": "228C",
+  "Implementum Real Estate GmbH": "230",
+  "JustSpices GmbH": "228A",
+  "NanoGiants GmbH": "230",
+  "Parkett Strehl GmbH": "228A",
+  "Pasabahce Glas GmbH": "228B",
+  "Phase 5 GmbH": "230",
+  "Piratas Werbeagentur GmbH & Co. KG": "228A",
+  "Relyens Mutual Insurance": "228B",
+  "Reviderm AG": "228B",
+  "Schmeing Bau GmbH": "224D",
+  "SOFACOMPANY GmbH": "228A",
+  "SV Group GmbH": "230",
+  "The Reach Group GmbH": "228A",
+  "4stairs": "230",
+  "ifenius": "228A",
+  "Kiosk": "214",
+  "Parking Garage": "PARKING"
+};
+
+// Function to show entrance markers for a specific building
+function showEntranceMarkers(buildingCode) {
+  console.log("Showing entrance markers for building:", buildingCode);
+  
+  // Show all entrance markers
+  map.setPaintProperty("entrance-circles", "circle-opacity", 1);
+  map.setPaintProperty("entrance-labels", "text-opacity", 1);
+}
+
+// Function to hide all entrance markers
+function hideEntranceMarkers() {
+  console.log("Hiding all entrance markers");
+  
+  // Hide all entrance markers
+  map.setPaintProperty("entrance-circles", "circle-opacity", 0);
+  map.setPaintProperty("entrance-labels", "text-opacity", 0);
+}
+
+// Make functions and data globally accessible
+window.showEntranceMarkers = showEntranceMarkers;
+window.hideEntranceMarkers = hideEntranceMarkers;
+window.companyEntranceMapping = companyEntranceMapping;
 
 function initGeolocation() {
   if ("geolocation" in navigator) {
@@ -497,11 +595,14 @@ function initGeolocation() {
         console.log("Accuracy:", position.coords.accuracy, "meters");
         console.log("Heading:", heading, "degrees");
 
+        // Update user location and marker
         navigationManager.setUserLocation(loc, heading);
-        navigationManager.updateRouteProgress(loc);
-
-        // Only zoom to location when navigation is active
+        
+        // Update route progress if navigation is active
         if (navigationManager.navigationActive) {
+          navigationManager.updateRouteProgress(loc);
+          
+          // Only zoom to location when navigation is active
           map.flyTo({
             center: loc,
             zoom: 18,

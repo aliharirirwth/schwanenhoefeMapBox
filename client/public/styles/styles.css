@@ -956,6 +956,28 @@ body {
     transform: scale(1.1);
 }
 
+/* User Marker Enhancements */
+.user-marker-container {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.user-marker-container:hover {
+    transform: scale(1.1);
+}
+
+.user-marker-circle {
+    transition: all 0.3s ease;
+}
+
+.user-direction-arrow {
+    pointer-events: none;
+}
+
+.user-marker-pulse {
+    pointer-events: none;
+}
+
 /* Route Line Enhancements */
 .mapboxgl-canvas {
     filter: contrast(1.1) saturate(1.1);

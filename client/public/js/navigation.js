@@ -10,6 +10,8 @@ let destinationMarker = null;
 let traveledPath = [];
 let routeDistance = 0;
 let distanceDisplay = null;
+let lastUserPosition = null; // Track last known position
+let userHeading = 0; // Track user heading/direction
 
 export class NavigationManager {
     constructor(map, mapboxgl) {
@@ -21,42 +23,36 @@ export class NavigationManager {
     }
 
     initDeviceOrientation() {
-        // Listen for device orientation changes (for mobile devices)
         if (window.DeviceOrientationEvent) {
-            // Request permission for device orientation (iOS 13+)
-            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                // Automatically request permission when navigation starts
-                this.requestOrientationPermission();
-            } else {
-                // For devices that don't require permission
-                this.setupDeviceOrientationListener();
-            }
+            window.addEventListener('deviceorientation', (event) => {
+                if (event.alpha !== null) {
+                    // Use alpha (compass heading) for direction
+                    this.updateUserDirection(event.alpha);
+                }
+            });
         }
     }
 
     async requestOrientationPermission() {
-        try {
-            const permission = await DeviceOrientationEvent.requestPermission();
-            if (permission === 'granted') {
-                this.setupDeviceOrientationListener();
+        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                const permission = await DeviceOrientationEvent.requestPermission();
+                if (permission === 'granted') {
+                    this.setupDeviceOrientationListener();
+                }
+            } catch (error) {
+                console.error('Error requesting orientation permission:', error);
             }
-        } catch (error) {
-            console.log('Device orientation permission denied or not available');
         }
     }
 
     setupDeviceOrientationListener() {
         window.addEventListener('deviceorientation', (event) => {
             if (event.alpha !== null) {
-                // alpha is the rotation around the z-axis (0-360 degrees)
-                // Convert to match mapbox coordinate system
-                const heading = 360 - event.alpha;
-                this.updateUserDirection(heading);
+                this.updateUserDirection(event.alpha);
             }
         });
     }
-
-    // Removed the orientation permission button - now automatically requests permission
 
     createDistanceDisplay() {
         // Create distance display element
@@ -75,84 +71,142 @@ export class NavigationManager {
             font-weight: 600;
             z-index: 1000;
             display: none;
+            backdrop-filter: blur(10px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         `;
         document.body.appendChild(distanceDisplay);
     }
 
     setUserLocation(location, heading = null) {
+        // Store the new location
+        const newLocation = [...location];
+        
         // Only update if location has actually changed significantly
-        if (userCurrentLocation) {
+        if (lastUserPosition) {
             const distance = Math.sqrt(
-                Math.pow(userCurrentLocation[0] - location[0], 2) + 
-                Math.pow(userCurrentLocation[1] - location[1], 2)
+                Math.pow(lastUserPosition[0] - newLocation[0], 2) + 
+                Math.pow(lastUserPosition[1] - newLocation[1], 2)
             );
             
-            // Only update if movement is significant (more than 1 meter)
-            if (distance < 0.00001) { // Approximately 1 meter
+            // Only update if movement is significant (more than 3 meters)
+            // Increased threshold to prevent micro-movements during zoom
+            if (distance < 0.00003) { // Approximately 3 meters
                 return;
             }
         }
         
-        userCurrentLocation = location;
-        this.updateUserMarker();
+        // Update stored positions
+        lastUserPosition = [...newLocation];
+        userCurrentLocation = newLocation;
         
-        // Update direction if heading is provided
+        // Update heading if provided
         if (heading !== null && heading !== undefined) {
-            this.updateUserDirection(heading);
+            userHeading = heading;
         }
+        
+        // Create or update user marker
+        this.createOrUpdateUserMarker();
     }
 
     updateUserDirection(heading) {
+        userHeading = heading;
+        this.updateUserMarkerDirection();
+    }
+
+    updateUserMarkerDirection() {
         if (!userMarker) return;
         
-        const directionIndicator = document.getElementById('user-direction-indicator');
+        const directionIndicator = userMarker.getElement().querySelector('.user-direction-arrow');
         if (directionIndicator) {
             // Rotate the direction indicator based on heading
             // Mapbox uses 0° as North, so we need to adjust accordingly
-            const rotation = heading || 0;
+            const rotation = userHeading || 0;
             directionIndicator.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
         }
     }
 
-    setDestination(destination) {
-        selectedDestination = destination;
-        console.log('Destination set:', destination);
-    }
-
-    updateUserMarker() {
+    createOrUpdateUserMarker() {
         if (!userCurrentLocation) return;
         
         // Create user marker only once if it doesn't exist
         if (!userMarker) {
             const el = document.createElement('div');
+            el.className = 'user-marker-container';
             el.style.cssText = `
-                width: 24px;
-                height: 24px;
-                background: #4285f4;
-                border: 3px solid white;
-                border-radius: 50%;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                width: 32px;
+                height: 32px;
                 position: relative;
                 transition: transform 0.3s ease;
             `;
             
+            // Create the main marker circle
+            const markerCircle = document.createElement('div');
+            markerCircle.className = 'user-marker-circle';
+            markerCircle.style.cssText = `
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #4285f4, #1976d2);
+                border: 3px solid white;
+                border-radius: 50%;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+                position: relative;
+                z-index: 2;
+            `;
+            
             // Add direction indicator (arrow)
             const directionIndicator = document.createElement('div');
-            directionIndicator.id = 'user-direction-indicator';
+            directionIndicator.className = 'user-direction-arrow';
             directionIndicator.style.cssText = `
                 position: absolute;
-                top: -10px;
+                top: -12px;
                 left: 50%;
-                transform: translateX(-50%) rotate(0deg);
+                transform: translateX(-50%) rotate(${userHeading || 0}deg);
                 width: 0;
                 height: 0;
-                border-left: 8px solid transparent;
-                border-right: 8px solid transparent;
-                border-bottom: 16px solid #4285f4;
+                border-left: 10px solid transparent;
+                border-right: 10px solid transparent;
+                border-bottom: 20px solid #1976d2;
+                z-index: 1;
                 transition: transform 0.3s ease;
             `;
+            
+            // Add pulse animation
+            const pulseRing = document.createElement('div');
+            pulseRing.className = 'user-marker-pulse';
+            pulseRing.style.cssText = `
+                position: absolute;
+                top: -4px;
+                left: -4px;
+                width: 40px;
+                height: 40px;
+                border: 2px solid #4285f4;
+                border-radius: 50%;
+                animation: pulse 2s infinite;
+                z-index: 1;
+            `;
+            
+            // Add pulse animation CSS
+            if (!document.getElementById('user-marker-styles')) {
+                const style = document.createElement('style');
+                style.id = 'user-marker-styles';
+                style.textContent = `
+                    @keyframes pulse {
+                        0% {
+                            transform: scale(1);
+                            opacity: 1;
+                        }
+                        100% {
+                            transform: scale(2);
+                            opacity: 0;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            el.appendChild(pulseRing);
             el.appendChild(directionIndicator);
+            el.appendChild(markerCircle);
             
             userMarker = new this.mapboxgl.Marker({ 
                 element: el,
@@ -161,7 +215,7 @@ export class NavigationManager {
             .setLngLat(userCurrentLocation)
             .addTo(this.map);
         } else {
-            // Improved position update logic to prevent jumping
+            // Only update position if user has actually moved significantly
             const currentPos = userMarker.getLngLat();
             const newPos = userCurrentLocation;
             
@@ -171,12 +225,27 @@ export class NavigationManager {
                 Math.pow(currentPos.lat - newPos[1], 2)
             );
             
-            // Only update if the change is significant (more than 2 meters)
-            // Increased threshold to prevent micro-movements during zoom
-            if (distance > 0.00002) { // Approximately 2 meters
+            // Only update if the change is significant (more than 3 meters)
+            // This prevents jumping during zoom operations
+            if (distance > 0.00003) { // Approximately 3 meters
                 userMarker.setLngLat(userCurrentLocation);
             }
         }
+        
+        // Always update direction
+        this.updateUserMarkerDirection();
+    }
+
+    setDestination(destination) {
+        selectedDestination = destination;
+        console.log('Destination set:', destination);
+    }
+
+    updateUserMarker() {
+        // This function is now deprecated, use createOrUpdateUserMarker
+        // Keeping it for now to avoid breaking existing calls, but it will be removed
+        // if createOrUpdateUserMarker is fully integrated.
+        this.createOrUpdateUserMarker();
     }
 
     startNavigation() {
@@ -268,6 +337,9 @@ export class NavigationManager {
             userMarker.remove();
             userMarker = null;
         }
+        // Reset position tracking
+        lastUserPosition = null;
+        userHeading = 0;
     }
 
     enterFullscreenMode() {
@@ -778,6 +850,33 @@ export class NavigationManager {
                 error => console.error('GPS error:', error)
             );
         }
+    }
+
+    // Test method for the new user marker
+    testUserMarker() {
+        console.log('=== TESTING NEW USER MARKER ===');
+        
+        // Test with a sample location
+        const testLocation = [6.8143, 51.2187];
+        const testHeading = 45;
+        
+        console.log('Setting test location:', testLocation);
+        console.log('Setting test heading:', testHeading);
+        
+        this.setUserLocation(testLocation, testHeading);
+        
+        // Test direction update
+        setTimeout(() => {
+            console.log('Testing direction update...');
+            this.updateUserDirection(90);
+        }, 1000);
+        
+        // Test position update
+        setTimeout(() => {
+            console.log('Testing position update...');
+            const newLocation = [6.8144, 51.2188];
+            this.setUserLocation(newLocation, 180);
+        }, 2000);
     }
 }
 

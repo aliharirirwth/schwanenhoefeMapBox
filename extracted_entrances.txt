@@ -1,0 +1,48 @@
+alessandro International GmbH|Erkrather Straße 228 d|GEBÄUDE 5.3
+Lofthaus|51.21909079979885|6.815401118347866
+alessandro International GmbH Shop|Erkrather Straße 224 d|None|51.21965620856778|6.814845123649518
+Alfons & Alfreda Managment GmbH|Erkrather Straße 230|GEBÄUDE 5.2
+Grünes Haus|51.2191065689981|6.8148621284601925
+babiel GmbH|Erkrather Straße 224 a|GEBÄUDE 4|51.21946253446252|6.814624793879717
+Camp Physiotherapie|Erkrather Straße 224 b|GEBÄUDE 4|51.219595992816984|6.814614348112206
+FitX Deutschland GmbH|Erkrather Straße 230|GEBÄUDE 5.2
+Grünes Haus|51.2191065689981|6.8148621284601925
+Frango Portugûes GbR|Erkrather Straße 224|Frango Português|51.219305338596506|6.814255707139189
+GFG Life GmbH|Erkrather Straße 224 a|GEBÄUDE 4|51.21946253446252|6.814624793879717
+H.J. Heinz GmbH|Erkrather Straße 228 b|GEBÄUDE 5.1
+Galeriehaus|51.21960018501924|6.815659027163131
+Iberian Living home|Erkrather Straße 228 c|"GEBÄUDE 5.1
+Galeriehaus"|51.2193275680129|6.815606988214302
+Implementum Real Estate GmbH|Erkrather Straße 230|GEBÄUDE 5.2
+Grünes Haus|51.2191065689981|6.8148621284601925
+JustSpices GmbH|Erkrather Straße 228 a|GEBÄUDE 5.1
+Galeriehaus|51.219601254164274|6.815332751980058
+NanoGiants GmbH|Erkrather Straße 230|GEBÄUDE 5.2
+Grünes Haus|51.2191065689981|6.8148621284601925
+Parkett Strehl GmbH|Erkrather Straße 228 a |GEBÄUDE 5.1
+Galeriehaus|51.219601254164274|6.815332751980058
+Pasabahce Glas GmbH|Erkrather Straße 228 b|GEBÄUDE 5.1
+Galeriehaus|51.21960018501924|6.815659027163131
+Phase 5 GmbH|Erkrather Straße 230|GEBÄUDE 5.2
+Grünes Haus|51.2191065689981|6.8148621284601925
+Piratas Werbeagentur GmbH & Co. KG|Erkrather Straße 228 a|GEBÄUDE 5.1
+Galeriehaus|51.219601254164274|6.815332751980058
+Relyens Mutual Insurance|Erkrather Straße 228 b|GEBÄUDE 5.1
+Galeriehaus|51.21960018501924|6.815659027163131
+Reviderm AG|Erkrather Straße 228 b|GEBÄUDE 5.1
+Galeriehaus|51.21960018501924|6.815659027163131
+Schmeing Bau GmbH|Erkrather Straße 224 d|None|51.21965620856778|6.814845123649518
+SOFACOMPANY GmbH|Erkrather Straße 228 a|GEBÄUDE 5.1
+Galeriehaus|51.219601254164274|6.815332751980058
+SV Group GmbH|Erkrather Straße 230|GEBÄUDE 5.2
+Grünes Haus|51.2191065689981|6.8148621284601925
+The Reach Group GmbH|Erkrather Straße 228 a|GEBÄUDE 5.1
+Galeriehaus|51.219601254164274|6.815332751980058
+ERROR: WHU Wissenschaftliche Hochschule für Unternehmensführung|Erkrather Straße 224 a|GEBÄUDE 5.2
+Grünes Haus and also: GEBÄUDE 4
+Terrassenhaus|51.2191065689981, 6.8148621284601925 and also for other entraces: 51.219269337253934, 6.814416922682793|could not convert string to float: '6.8148621284601925 and also for other entraces: 51.219269337253934'
+4stairs|Erkrather Straße 230|GEBÄUDE 5.2
+Grünes Haus|51.2191065689981|6.8148621284601925
+ifenius|Erkrather Straße 228 a|GEBÄUDE 5.1
+Galeriehaus|51.219601254164274|6.815332751980058
+Kiosk|Erkrather Straße 214|Gebäude 11|51.219020967211904|6.814106240876804

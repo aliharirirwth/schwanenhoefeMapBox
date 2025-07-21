@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrance Markers Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Entrance Markers Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Company Selection</h2>
+        <p>Click a company to test entrance marker visibility:</p>
+        <button onclick="testCompany('Kiosk')">Kiosk (214)</button>
+        <button onclick="testCompany('babiel GmbH')">babiel GmbH (224A)</button>
+        <button onclick="testCompany('FitX Deutschland GmbH')">FitX (230)</button>
+        <button onclick="testCompany('Parking Garage')">Parking Garage</button>
+        <button onclick="hideMarkers()">Hide All Markers</button>
+        <div id="status" class="status">Status: Ready to test</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Building Selection</h2>
+        <p>Click a building number to test entrance marker visibility:</p>
+        <button onclick="testBuilding('214')">Building 214</button>
+        <button onclick="testBuilding('224A')">Building 224A</button>
+        <button onclick="testBuilding('230')">Building 230</button>
+        <button onclick="testBuilding('PARKING')">Parking Garage</button>
+        <div id="building-status" class="status">Status: Ready to test</div>
+    </div>
+
+    <script>
+        // Mock functions for testing
+        function testCompany(companyName) {
+            const status = document.getElementById('status');
+            status.textContent = `Status: Testing company "${companyName}" - entrance markers should be visible`;
+            console.log(`Testing company: ${companyName}`);
+        }
+
+        function testBuilding(buildingCode) {
+            const status = document.getElementById('building-status');
+            status.textContent = `Status: Testing building "${buildingCode}" - entrance markers should be visible`;
+            console.log(`Testing building: ${buildingCode}`);
+        }
+
+        function hideMarkers() {
+            const status = document.getElementById('status');
+            status.textContent = 'Status: Hiding all entrance markers';
+            console.log('Hiding all entrance markers');
+        }
+
+        // Log test information
+        console.log('Entrance Markers Test Page Loaded');
+        console.log('Expected behavior:');
+        console.log('1. Entrance markers (red circles) should be hidden by default');
+        console.log('2. When a company/building is selected, entrance markers should appear');
+        console.log('3. Parking garage should show a "P" icon');
+        console.log('4. House number 214 (Kiosk) should be available');
+    </script>
+</body>
+</html> 
