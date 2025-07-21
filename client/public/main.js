@@ -117,6 +117,10 @@ function initAppLogic() {
   window.testUserMarker = () => {
     navigationManager.testUserMarker();
   };
+  
+  window.getDirectionStatus = () => {
+    return navigationManager.getDirectionTrackingStatus();
+  };
 
   // Add global navigation test function
   window.testNavigation = () => {
@@ -589,6 +593,11 @@ function initGeolocation() {
         });
 
         navigationManager.setUserLocation(loc, heading);
+        
+        // Process GPS heading through the new direction tracking system
+        if (heading !== null && !isNaN(heading)) {
+            navigationManager.processGPSHeading(heading);
+        }
       },
       (error) => {
         console.error("Error getting initial location:", error);
@@ -615,6 +624,11 @@ function initGeolocation() {
 
         // Update user location and marker
         navigationManager.setUserLocation(loc, heading);
+        
+        // Process GPS heading through the new direction tracking system
+        if (heading !== null && !isNaN(heading)) {
+            navigationManager.processGPSHeading(heading);
+        }
         
         // Update route progress if navigation is active
         if (navigationManager.navigationActive) {

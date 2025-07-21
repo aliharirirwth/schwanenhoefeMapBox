@@ -964,10 +964,12 @@ body {
 
 .user-direction-triangle {
     pointer-events: none;
+    transition: transform 0.2s ease-out;
 }
 
 .user-direction-triangle-border {
     pointer-events: none;
+    transition: transform 0.2s ease-out;
 }
 
 /* Route Line Enhancements */

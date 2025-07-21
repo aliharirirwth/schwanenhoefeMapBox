@@ -13,23 +13,195 @@ let distanceDisplay = null;
 let lastUserPosition = null; // Track last known position
 let userHeading = 0; // Track user heading/direction
 
+// Direction tracking improvements
+let deviceOrientationAvailable = false;
+let compassAvailable = false;
+let lastDeviceHeading = null;
+let lastGPSHeading = null;
+let headingHistory = []; // For smoothing
+let headingUpdateTimeout = null;
+let magneticDeclination = 0; // Will be calculated based on location
+let isCalibrating = false;
+let calibrationSamples = [];
+let lastHeadingUpdate = 0;
+const HEADING_SMOOTHING_WINDOW = 10; // Number of samples for smoothing
+const HEADING_UPDATE_THROTTLE = 100; // Minimum ms between updates
+const HEADING_CHANGE_THRESHOLD = 5; // Minimum degrees change to update
+const COMPASS_CALIBRATION_SAMPLES = 20; // Samples needed for calibration
+
 export class NavigationManager {
     constructor(map, mapboxgl) {
         this.map = map;
         this.mapboxgl = mapboxgl;
         this.accessToken = mapboxgl.accessToken;
         this.createDistanceDisplay();
+        this.initDirectionTracking();
+    }
+
+    initDirectionTracking() {
+        // Initialize direction tracking with multiple sensors
         this.initDeviceOrientation();
+        this.initCompass();
+        this.initGPSHeading();
+        
+        // Request permissions for device orientation
+        this.requestOrientationPermission();
+        
+        console.log('Direction tracking initialized with sensor fusion');
     }
 
     initDeviceOrientation() {
         if (window.DeviceOrientationEvent) {
+            deviceOrientationAvailable = true;
+            console.log('Device orientation API available');
+            
             window.addEventListener('deviceorientation', (event) => {
-                if (event.alpha !== null) {
-                    // Use alpha (compass heading) for direction
-                    this.updateUserDirection(event.alpha);
-                }
+                this.handleDeviceOrientation(event);
             });
+        } else {
+            console.log('Device orientation API not available');
+        }
+    }
+
+    initCompass() {
+        // Check if compass is available through device orientation
+        if (window.DeviceOrientationEvent) {
+            compassAvailable = true;
+            console.log('Compass available through device orientation');
+        }
+    }
+
+    initGPSHeading() {
+        // GPS heading will be handled in the geolocation watcher
+        console.log('GPS heading tracking initialized');
+    }
+
+    handleDeviceOrientation(event) {
+        if (!event.alpha && !event.webkitCompassHeading) {
+            return;
+        }
+
+        let heading = null;
+        
+        // Try different compass APIs
+        if (event.webkitCompassHeading !== undefined) {
+            // iOS Safari
+            heading = event.webkitCompassHeading;
+        } else if (event.alpha !== null) {
+            // Android and other browsers
+            heading = 360 - event.alpha;
+        }
+
+        if (heading !== null && !isNaN(heading)) {
+            this.processDeviceHeading(heading);
+        }
+    }
+
+    processDeviceHeading(rawHeading) {
+        const now = Date.now();
+        
+        // Throttle updates
+        if (now - lastHeadingUpdate < HEADING_UPDATE_THROTTLE) {
+            return;
+        }
+
+        // Apply magnetic declination correction
+        let correctedHeading = (rawHeading + magneticDeclination) % 360;
+        if (correctedHeading < 0) correctedHeading += 360;
+
+        // Add to history for smoothing
+        headingHistory.push(correctedHeading);
+        if (headingHistory.length > HEADING_SMOOTHING_WINDOW) {
+            headingHistory.shift();
+        }
+
+        // Calculate smoothed heading using median filter
+        const smoothedHeading = this.calculateSmoothedHeading();
+        
+        // Only update if change is significant
+        if (Math.abs(smoothedHeading - userHeading) > HEADING_CHANGE_THRESHOLD) {
+            lastDeviceHeading = smoothedHeading;
+            this.updateUserDirection(smoothedHeading);
+            lastHeadingUpdate = now;
+        }
+    }
+
+    calculateSmoothedHeading() {
+        if (headingHistory.length === 0) return userHeading;
+        
+        // Use median filter for robust smoothing
+        const sorted = [...headingHistory].sort((a, b) => a - b);
+        const median = sorted[Math.floor(sorted.length / 2)];
+        
+        // Apply low-pass filter for additional smoothing
+        const alpha = 0.3; // Smoothing factor
+        return (alpha * median) + ((1 - alpha) * userHeading);
+    }
+
+    processGPSHeading(gpsHeading) {
+        if (gpsHeading === null || isNaN(gpsHeading)) {
+            return;
+        }
+
+        const now = Date.now();
+        
+        // Throttle GPS heading updates
+        if (now - lastHeadingUpdate < HEADING_UPDATE_THROTTLE * 2) {
+            return;
+        }
+
+        // Apply magnetic declination correction
+        let correctedHeading = (gpsHeading + magneticDeclination) % 360;
+        if (correctedHeading < 0) correctedHeading += 360;
+
+        // Only use GPS heading if device orientation is not available
+        // or if GPS heading is more recent and accurate
+        if (!deviceOrientationAvailable || !lastDeviceHeading) {
+            lastGPSHeading = correctedHeading;
+            this.updateUserDirection(correctedHeading);
+            lastHeadingUpdate = now;
+        }
+    }
+
+    calculateMagneticDeclination(latitude, longitude) {
+        // Simple magnetic declination calculation
+        // In a production app, you'd use a proper magnetic declination service
+        // For now, we'll use a rough approximation
+        const year = new Date().getFullYear();
+        const lat = latitude * Math.PI / 180;
+        const lon = longitude * Math.PI / 180;
+        
+        // Simplified calculation - in reality, you'd use a proper model
+        // This is just a placeholder for demonstration
+        const declination = Math.sin(lat) * Math.cos(lon) * 10;
+        return declination;
+    }
+
+    updateUserDirection(heading) {
+        // Debounce heading updates
+        if (headingUpdateTimeout) {
+            clearTimeout(headingUpdateTimeout);
+        }
+
+        headingUpdateTimeout = setTimeout(() => {
+            userHeading = heading;
+            this.updateUserMarkerDirection();
+        }, 50); // 50ms debounce
+    }
+
+    updateUserMarkerDirection() {
+        if (!userMarker) return;
+        
+        const triangle = userMarker.getElement().querySelector('.user-direction-triangle');
+        const triangleBorder = userMarker.getElement().querySelector('.user-direction-triangle-border');
+        
+        if (triangle && triangleBorder) {
+            // Apply smooth rotation with CSS transitions
+            const rotation = userHeading || 0;
+            
+            // Use CSS transform for smooth rotation
+            triangle.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+            triangleBorder.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
         }
     }
 
@@ -39,19 +211,21 @@ export class NavigationManager {
                 const permission = await DeviceOrientationEvent.requestPermission();
                 if (permission === 'granted') {
                     this.setupDeviceOrientationListener();
+                    console.log('Device orientation permission granted');
+                } else {
+                    console.log('Device orientation permission denied, using GPS heading only');
                 }
             } catch (error) {
                 console.error('Error requesting orientation permission:', error);
             }
+        } else {
+            console.log('Device orientation permission not required, using default behavior');
         }
     }
 
     setupDeviceOrientationListener() {
-        window.addEventListener('deviceorientation', (event) => {
-            if (event.alpha !== null) {
-                this.updateUserDirection(event.alpha);
-            }
-        });
+        // This is now handled in initDeviceOrientation
+        console.log('Device orientation listener already set up');
     }
 
     createDistanceDisplay() {
@@ -109,28 +283,14 @@ export class NavigationManager {
             userHeading = heading;
         }
         
+        // Update magnetic declination based on new location
+        if (newLocation.length === 2) {
+            magneticDeclination = this.calculateMagneticDeclination(newLocation[1], newLocation[0]);
+            console.log('Updated magnetic declination:', magneticDeclination, 'degrees');
+        }
+        
         // Create or update user marker
         this.createOrUpdateUserMarker();
-    }
-
-    updateUserDirection(heading) {
-        userHeading = heading;
-        this.updateUserMarkerDirection();
-    }
-
-    updateUserMarkerDirection() {
-        if (!userMarker) return;
-        
-        const triangle = userMarker.getElement().querySelector('.user-direction-triangle');
-        const triangleBorder = userMarker.getElement().querySelector('.user-direction-triangle-border');
-        
-        if (triangle && triangleBorder) {
-            // Rotate both the triangle and its border based on heading
-            // Mapbox uses 0° as North, so we need to adjust accordingly
-            const rotation = userHeading || 0;
-            triangle.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-            triangleBorder.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-        }
     }
 
     createOrUpdateUserMarker() {
@@ -855,6 +1015,19 @@ export class NavigationManager {
             const newLocation = [6.8144, 51.2188];
             this.setUserLocation(newLocation, 180);
         }, 2000);
+    }
+
+    getDirectionTrackingStatus() {
+        return {
+            deviceOrientationAvailable,
+            compassAvailable,
+            lastDeviceHeading,
+            lastGPSHeading,
+            userHeading,
+            magneticDeclination,
+            headingHistoryLength: headingHistory.length,
+            isCalibrating
+        };
     }
 }
 
