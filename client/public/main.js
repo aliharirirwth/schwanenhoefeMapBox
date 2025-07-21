@@ -81,17 +81,6 @@ function initAppLogic() {
 
   map.addControl(new mapboxgl.NavigationControl(), "top-right");
 
-  // Add click event listener to get lat/lng coordinates
-  map.on("click", (e) => {
-    const lat = e.lngLat.lat;
-    const lng = e.lngLat.lng;
-    console.log(`Clicked coordinates: Latitude: ${lat}, Longitude: ${lng}`);
-    console.log(`Copy-paste format: { lat: ${lat}, lng: ${lng} }`);
-
-    // Also show in an alert for easy copying
-    // alert(`Clicked coordinates:\nLatitude: ${lat}\nLongitude: ${lng}\n\nCopy format: { lat: ${lat}, lng: ${lng} }`);
-  });
-
   // Initialize managers
   navigationManager = new NavigationManager(map, mapboxgl);
   uiManager = new UIManager(navigationManager);
